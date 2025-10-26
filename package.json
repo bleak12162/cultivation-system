@@ -1,0 +1,9 @@
+{
+  "name": "cultivation-system",
+  "version": "1.0.0",
+  "description": "栽培履歴管理システム",
+  "type": "module",
+  "dependencies": {
+    "@vercel/postgres": "^0.5.1"
+  }
+}

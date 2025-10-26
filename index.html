@@ -445,7 +445,7 @@
         }
 
         // データ保存
-        function saveRecord() {
+        async function saveRecord() {
             const data = collectFormData();
             
             if (!data.recorder_name || !data.product_name) {
@@ -453,123 +453,153 @@
                 return;
             }
 
-            let records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
-            
-            const existingIndex = records.findIndex(r => r.id === data.id);
-            if (existingIndex >= 0) {
-                records[existingIndex] = data;
-                showNotification('履歴を更新しました');
-            } else {
-                records.push(data);
-                showNotification('履歴を保存しました');
+            try {
+                const url = currentRecordId 
+                    ? `/api/records?id=${currentRecordId}`
+                    : '/api/records';
+                const method = currentRecordId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) throw new Error('保存に失敗しました');
+
+                const result = await response.json();
+                if (!currentRecordId) currentRecordId = result.id;
+
+                showNotification(currentRecordId ? '履歴を更新しました' : '履歴を保存しました');
+            } catch (error) {
+                showNotification('エラー: ' + error.message, 'error');
             }
-            
-            localStorage.setItem('cultivationRecords', JSON.stringify(records));
-            currentRecordId = data.id;
         }
 
         // レコード一覧読み込み
-        function loadRecords() {
-            const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
-            const container = document.getElementById('records-container');
-            
-            if (records.length === 0) {
-                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">保存された履歴がありません</p>';
-                return;
-            }
+        async function loadRecords() {
+            try {
+                const response = await fetch('/api/records');
+                if (!response.ok) throw new Error('データ取得に失敗しました');
 
-            container.innerHTML = records.map(record => `
-                <div class="record-card">
-                    <h3>${record.product_name || '(商品名なし)'}</h3>
-                    <p><strong>生産者:</strong> ${record.producer_name || '-'}</p>
-                    <p><strong>記入者:</strong> ${record.recorder_name || '-'}</p>
-                    <p><strong>保存日時:</strong> ${new Date(record.timestamp).toLocaleString('ja-JP')}</p>
-                    <div class="record-actions">
-                        <button class="btn btn-secondary" onclick="loadRecord(${record.id})">✏️ 編集</button>
-                        <button class="btn btn-primary" onclick="generatePDFForRecord(${record.id})">📄 PDF</button>
-                        <button class="btn btn-remove" onclick="deleteRecord(${record.id})">🗑️ 削除</button>
+                const records = await response.json();
+                const container = document.getElementById('records-container');
+                
+                if (records.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">保存された履歴がありません</p>';
+                    return;
+                }
+
+                container.innerHTML = records.map(record => {
+                    const data = record.data || record;
+                    return `
+                    <div class="record-card">
+                        <h3>${data.product_name || '(商品名なし)'}</h3>
+                        <p><strong>生産者:</strong> ${data.producer_name || '-'}</p>
+                        <p><strong>記入者:</strong> ${data.recorder_name || '-'}</p>
+                        <p><strong>保存日時:</strong> ${new Date(record.created_at).toLocaleString('ja-JP')}</p>
+                        <div class="record-actions">
+                            <button class="btn btn-secondary" onclick="loadRecord(${record.id})">✏️ 編集</button>
+                            <button class="btn btn-primary" onclick="generatePDFForRecord(${record.id})">📄 PDF</button>
+                            <button class="btn btn-remove" onclick="deleteRecord(${record.id})">🗑️ 削除</button>
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `}).join('');
+            } catch (error) {
+                showNotification('エラー: ' + error.message, 'error');
+            }
         }
 
         // レコード読み込み
-        function loadRecord(id) {
-            const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
-            const record = records.find(r => r.id === id);
-            
-            if (!record) return;
+        async function loadRecord(id) {
+            try {
+                const response = await fetch(`/api/records?id=${id}`);
+                if (!response.ok) throw new Error('データ取得に失敗しました');
 
-            currentRecordId = id;
-            
-            document.getElementById('recorder_name').value = record.recorder_name || '';
-            document.getElementById('recorder_org').value = record.recorder_org || '';
-            document.getElementById('recorder_address').value = record.recorder_address || '';
-            document.getElementById('recorder_tel').value = record.recorder_tel || '';
-            document.getElementById('recorder_fax').value = record.recorder_fax || '';
-            document.getElementById('producer_name').value = record.producer_name || '';
-            document.getElementById('producer_org').value = record.producer_org || '';
-            document.getElementById('product_name').value = record.product_name || '';
-            document.getElementById('product_spec').value = record.product_spec || '';
-            document.getElementById('cultivation_variety').value = record.cultivation_variety || '';
-            document.getElementById('planting_area').value = record.planting_area || '';
-            document.getElementById('plant_count').value = record.plant_count || '';
-            document.getElementById('expected_yield').value = record.expected_yield || '';
-            document.getElementById('cultivation_type').value = record.cultivation_type || '';
-            document.getElementById('seed_type').value = record.seed_type || '';
-            document.getElementById('seed_supplier').value = record.seed_supplier || '';
-            document.getElementById('seedling_method').value = record.seedling_method || '';
-            document.getElementById('prev_crop_name').value = record.prev_crop_name || '';
-            document.getElementById('cultivation_class').value = record.cultivation_class || '';
+                const result = await response.json();
+                const record = result.data || result;
+                
+                if (!record) return;
 
-            // 肥料テーブル
-            const fertTable = document.querySelector('#fertilizer-table tbody');
-            fertTable.innerHTML = '';
-            (record.fertilizers || []).forEach((fert, i) => {
-                addFertilizerRow();
-                const row = fertTable.rows[i];
-                row.querySelector('.fert-date').value = fert.date || '';
-                row.querySelector('.fert-name').value = fert.name || '';
-                row.querySelector('.fert-material').value = fert.material || '';
-                row.querySelector('.fert-maker').value = fert.maker || '';
-                row.querySelector('.fert-amount').value = fert.amount || '';
-                row.querySelector('.fert-notes').value = fert.notes || '';
-            });
-            if (fertTable.rows.length === 0) addFertilizerRow();
+                currentRecordId = id;
+                
+                document.getElementById('recorder_name').value = record.recorder_name || '';
+                document.getElementById('recorder_org').value = record.recorder_org || '';
+                document.getElementById('recorder_address').value = record.recorder_address || '';
+                document.getElementById('recorder_tel').value = record.recorder_tel || '';
+                document.getElementById('recorder_fax').value = record.recorder_fax || '';
+                document.getElementById('producer_name').value = record.producer_name || '';
+                document.getElementById('producer_org').value = record.producer_org || '';
+                document.getElementById('product_name').value = record.product_name || '';
+                document.getElementById('product_spec').value = record.product_spec || '';
+                document.getElementById('cultivation_variety').value = record.cultivation_variety || '';
+                document.getElementById('planting_area').value = record.planting_area || '';
+                document.getElementById('plant_count').value = record.plant_count || '';
+                document.getElementById('expected_yield').value = record.expected_yield || '';
+                document.getElementById('cultivation_type').value = record.cultivation_type || '';
+                document.getElementById('seed_type').value = record.seed_type || '';
+                document.getElementById('seed_supplier').value = record.seed_supplier || '';
+                document.getElementById('seedling_method').value = record.seedling_method || '';
+                document.getElementById('prev_crop_name').value = record.prev_crop_name || '';
+                document.getElementById('cultivation_class').value = record.cultivation_class || '';
 
-            // 農薬テーブル
-            const pestTable = document.querySelector('#pesticide-table tbody');
-            pestTable.innerHTML = '';
-            (record.pesticides || []).forEach((pest, i) => {
-                addPesticideRow();
-                const row = pestTable.rows[i];
-                row.querySelector('.pest-date').value = pest.date || '';
-                row.querySelector('.pest-name').value = pest.name || '';
-                row.querySelector('.pest-ingredient').value = pest.ingredient || '';
-                row.querySelector('.pest-maker').value = pest.maker || '';
-                row.querySelector('.pest-dilution').value = pest.dilution || '';
-                row.querySelector('.pest-target').value = pest.target || '';
-            });
-            if (pestTable.rows.length === 0) addPesticideRow();
+                // 肥料テーブル
+                const fertTable = document.querySelector('#fertilizer-table tbody');
+                fertTable.innerHTML = '';
+                (record.fertilizers || []).forEach((fert, i) => {
+                    addFertilizerRow();
+                    const row = fertTable.rows[i];
+                    row.querySelector('.fert-date').value = fert.date || '';
+                    row.querySelector('.fert-name').value = fert.name || '';
+                    row.querySelector('.fert-material').value = fert.material || '';
+                    row.querySelector('.fert-maker').value = fert.maker || '';
+                    row.querySelector('.fert-amount').value = fert.amount || '';
+                    row.querySelector('.fert-notes').value = fert.notes || '';
+                });
+                if (fertTable.rows.length === 0) addFertilizerRow();
 
-            switchTab(0);
-            showNotification('履歴を読み込みました');
+                // 農薬テーブル
+                const pestTable = document.querySelector('#pesticide-table tbody');
+                pestTable.innerHTML = '';
+                (record.pesticides || []).forEach((pest, i) => {
+                    addPesticideRow();
+                    const row = pestTable.rows[i];
+                    row.querySelector('.pest-date').value = pest.date || '';
+                    row.querySelector('.pest-name').value = pest.name || '';
+                    row.querySelector('.pest-ingredient').value = pest.ingredient || '';
+                    row.querySelector('.pest-maker').value = pest.maker || '';
+                    row.querySelector('.pest-dilution').value = pest.dilution || '';
+                    row.querySelector('.pest-target').value = pest.target || '';
+                });
+                if (pestTable.rows.length === 0) addPesticideRow();
+
+                switchTab(0);
+                showNotification('履歴を読み込みました');
+            } catch (error) {
+                showNotification('エラー: ' + error.message, 'error');
+            }
         }
 
         // レコード削除
-        function deleteRecord(id) {
+        async function deleteRecord(id) {
             if (!confirm('この履歴を削除しますか?')) return;
             
-            let records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
-            records = records.filter(r => r.id !== id);
-            localStorage.setItem('cultivationRecords', JSON.stringify(records));
-            
-            if (currentRecordId === id) {
-                currentRecordId = null;
+            try {
+                const response = await fetch(`/api/records?id=${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) throw new Error('削除に失敗しました');
+                
+                if (currentRecordId === id) {
+                    currentRecordId = null;
+                }
+                
+                loadRecords();
+                showNotification('履歴を削除しました');
+            } catch (error) {
+                showNotification('エラー: ' + error.message, 'error');
             }
-            
-            loadRecords();
-            showNotification('履歴を削除しました');
         }
 
         // フォームクリア
