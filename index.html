@@ -2092,7 +2092,121 @@
             </tr>
         </table>
         
-        <div class="page-number">Page 2 of 2</div>
+        <div class="page-number">Page 2 of 3</div>
+    </div>
+
+    <!-- ページ3: 月別スケジュール表と進捗管理 -->
+    <div class="page">
+        <!-- 月別スケジュール表 -->
+        <div class="section-title">月別スケジュール表</div>
+        <table style="font-size: 6.5pt; width: 100%;">
+            <thead>
+                <tr style="background: #5f72bd; color: white;">
+                    <th style="width: 12%;">項目</th>
+                    <th style="width: 7%;">1月</th><th style="width: 7%;">2月</th><th style="width: 7%;">3月</th>
+                    <th style="width: 7%;">4月</th><th style="width: 7%;">5月</th><th style="width: 7%;">6月</th>
+                    <th style="width: 7%;">7月</th><th style="width: 7%;">8月</th><th style="width: 7%;">9月</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="background: #f0f0f0; font-weight: 600;">作業</td>
+                    <td>${(data.monthlySchedule?.work?.jan || '')}</td>
+                    <td>${(data.monthlySchedule?.work?.feb || '')}</td>
+                    <td>${(data.monthlySchedule?.work?.mar || '')}</td>
+                    <td>${(data.monthlySchedule?.work?.apr || '')}</td>
+                    <td>${(data.monthlySchedule?.work?.may || '')}</td>
+                    <td>${(data.monthlySchedule?.work?.jun || '')}</td>
+                    <td>${(data.monthlySchedule?.work?.jul || '')}</td>
+                    <td>${(data.monthlySchedule?.work?.aug || '')}</td>
+                    <td>${(data.monthlySchedule?.work?.sep || '')}</td>
+                </tr>
+                <tr>
+                    <td style="background: #f0f0f0; font-weight: 600;">肥料(No)</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.jan || '')}</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.feb || '')}</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.mar || '')}</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.apr || '')}</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.may || '')}</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.jun || '')}</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.jul || '')}</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.aug || '')}</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.sep || '')}</td>
+                </tr>
+                <tr>
+                    <td style="background: #f0f0f0; font-weight: 600;">防除(No)</td>
+                    <td>${(data.monthlySchedule?.pesticide?.jan || '')}</td>
+                    <td>${(data.monthlySchedule?.pesticide?.feb || '')}</td>
+                    <td>${(data.monthlySchedule?.pesticide?.mar || '')}</td>
+                    <td>${(data.monthlySchedule?.pesticide?.apr || '')}</td>
+                    <td>${(data.monthlySchedule?.pesticide?.may || '')}</td>
+                    <td>${(data.monthlySchedule?.pesticide?.jun || '')}</td>
+                    <td>${(data.monthlySchedule?.pesticide?.jul || '')}</td>
+                    <td>${(data.monthlySchedule?.pesticide?.aug || '')}</td>
+                    <td>${(data.monthlySchedule?.pesticide?.sep || '')}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <table style="font-size: 6.5pt; width: 100%; margin-top: 3pt;">
+            <tbody>
+                <tr>
+                    <th style="width: 12%; background: #5f72bd; color: white;">項目</th>
+                    <th style="width: 7%; background: #5f72bd; color: white;">10月</th>
+                    <th style="width: 7%; background: #5f72bd; color: white;">11月</th>
+                    <th style="width: 7%; background: #5f72bd; color: white;">12月</th>
+                    <td style="width: 60%;"></td>
+                </tr>
+                <tr>
+                    <td style="background: #f0f0f0; font-weight: 600;">作業</td>
+                    <td>${(data.monthlySchedule?.work?.oct || '')}</td>
+                    <td>${(data.monthlySchedule?.work?.nov || '')}</td>
+                    <td>${(data.monthlySchedule?.work?.dec || '')}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="background: #f0f0f0; font-weight: 600;">肥料(No)</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.oct || '')}</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.nov || '')}</td>
+                    <td>${(data.monthlySchedule?.fertilizer?.dec || '')}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td style="background: #f0f0f0; font-weight: 600;">防除(No)</td>
+                    <td>${(data.monthlySchedule?.pesticide?.oct || '')}</td>
+                    <td>${(data.monthlySchedule?.pesticide?.nov || '')}</td>
+                    <td>${(data.monthlySchedule?.pesticide?.dec || '')}</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 進捗管理・基準情報 -->
+        <div class="section-title" style="margin-top: 15pt;">進捗管理・基準情報</div>
+
+        <div style="font-size: 8pt; margin-bottom: 8pt;">
+            <div style="font-weight: 600; margin-bottom: 3pt;">前作物での使用状況：</div>
+            <div>
+                化学肥料: ${data.prev_crop_chemical_fertilizer === 'yes' ? '有' : data.prev_crop_chemical_fertilizer === 'no' ? '無' : '-'} /
+                土壌消毒: ${data.prev_crop_soil_sterilization === 'yes' ? '実施' : data.prev_crop_soil_sterilization === 'no' ? '未実施' : '-'} /
+                除草剤: ${data.prev_crop_herbicide === 'yes' ? '有' : data.prev_crop_herbicide === 'no' ? '無' : '-'}
+            </div>
+        </div>
+
+        <div style="font-size: 8pt;">
+            <div style="font-weight: 600; margin-bottom: 3pt;">栽培認証・基準：</div>
+            <div>
+                有機JAS認証: ${data.organic_jas_certification === 'certified' ? '認証取得' : data.organic_jas_certification === 'in_process' ? '取得中' : '未申請'} /
+                特別栽培: ${data.special_cultivation_certified === 'yes' ? '認定' : data.special_cultivation_certified === 'no' ? '非認定' : '-'} /
+                エコファーマー: ${data.eco_farmer_certified === 'yes' ? '認定' : data.eco_farmer_certified === 'no' ? '非認定' : '-'}
+            </div>
+            <div style="margin-top: 3pt;">
+                優先農薬使用: ${data.priority_pesticide === 'yes' ? '有' : data.priority_pesticide === 'no' ? '無' : '-'} /
+                環境配慮加算: ${data.environment_incentive === 'yes' ? '適用' : data.environment_incentive === 'no' ? '非適用' : '-'}
+            </div>
+        </div>
+
+        <div class="page-number">Page 3 of 3</div>
     </div>
 </body>
 </html>
