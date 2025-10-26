@@ -89,6 +89,15 @@
         <!-- タブ1: 入力フォーム -->
         <div class="tab-content active">
             <div class="section">
+                <div class="section-title">基本情報</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>記入日<span class="required">*</span></label>
+                        <input type="date" id="record_date" required>
+                    </div>
+                </div>
+            </div>
+            <div class="section">
                 <div class="section-title">記入者情報</div>
                 <div class="form-grid">
                     <div class="form-group">
@@ -128,35 +137,64 @@
             </div>
             
             <div class="section">
-                <div class="section-title">商品情報</div>
+                <div class="section-title">商品・品種情報</div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label>商品名<span class="required">*</span></label>
-                        <input type="text" id="product_name" placeholder="ミニトマト">
+                        <input type="text" id="product_name" placeholder="ブロッコリー">
                     </div>
                     <div class="form-group">
                         <label>規格</label>
-                        <input type="text" id="product_spec" placeholder="150g">
-                    </div>
-                    <div class="form-group">
-                        <label>栽培品種</label>
-                        <input type="text" id="cultivation_variety" placeholder="アイコ">
-                    </div>
-                    <div class="form-group">
-                        <label>作付面積（㎡）</label>
-                        <input type="number" id="planting_area" step="0.1" placeholder="500">
-                    </div>
-                    <div class="form-group">
-                        <label>栽植株数</label>
-                        <input type="number" id="plant_count" placeholder="1000">
-                    </div>
-                    <div class="form-group">
-                        <label>予想収量（kg）</label>
-                        <input type="number" id="expected_yield" step="0.1" placeholder="1500">
+                        <input type="text" id="product_spec" placeholder="S-M">
                     </div>
                     <div class="form-group full-width">
                         <label>作型</label>
-                        <input type="text" id="cultivation_type" placeholder="例:促成栽培、抑制栽培など">
+                        <input type="text" id="cultivation_type" placeholder="露地秋冬ブロッコリー">
+                    </div>
+                </div>
+
+                <!-- 複数品種テーブル -->
+                <div style="margin-top: 25px; padding-top: 25px; border-top: 2px solid #ddd;">
+                    <h4 style="color: #5f72bd; margin-bottom: 15px; font-size: 16px; font-weight: 600;">📊 品種情報（複数品種対応）</h4>
+                    <table id="varieties-table" style="margin-bottom: 15px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 30px;">No.</th>
+                                <th>品種名</th>
+                                <th style="width: 100px;">作付面積(a)</th>
+                                <th style="width: 110px;">栽植株数/10a</th>
+                                <th style="width: 110px;">予想反収(kg/10a)</th>
+                                <th style="width: 100px;">予想収量</th>
+                                <th style="width: 50px;">削除</th>
+                            </tr>
+                        </thead>
+                        <tbody id="varieties-tbody">
+                            <tr>
+                                <td>1</td>
+                                <td><input type="text" class="variety-name" placeholder="例:ルミナス" style="width: 100%;"></td>
+                                <td><input type="number" class="planting-area" step="0.1" placeholder="100" style="width: 100%;"></td>
+                                <td><input type="number" class="plant-count-10a" placeholder="4000" style="width: 100%;"></td>
+                                <td><input type="number" class="expected-yield-10a" step="0.1" placeholder="800" style="width: 100%;"></td>
+                                <td><input type="number" class="expected-yield-total" readonly placeholder="自動計算" style="width: 100%; background: #f0f0f0; font-weight: 600;"></td>
+                                <td><button class="btn-remove" onclick="removeRow(this)">削除</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn-add-row" onclick="addVarietyRow()">+ 品種を追加</button>
+                </div>
+
+                <!-- 合計値表示 -->
+                <div style="margin-top: 25px; padding: 20px; background: #e8f5e9; border-radius: 8px; border-left: 4px solid #2e7d32;">
+                    <h4 style="color: #2e7d32; margin-bottom: 15px; font-weight: 600;">合計値（自動計算）</h4>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                        <div class="form-group">
+                            <label style="color: #2e7d32; font-weight: 700;">作付総面積</label>
+                            <input type="number" id="total-planting-area" readonly placeholder="0" style="margin-top: 8px; background: white; font-weight: 700; color: #2e7d32; font-size: 16px;">
+                        </div>
+                        <div class="form-group">
+                            <label style="color: #2e7d32; font-weight: 700;">予想総収量（kg）</label>
+                            <input type="number" id="total-expected-yield" readonly placeholder="0" style="margin-top: 8px; background: white; font-weight: 700; color: #2e7d32; font-size: 16px;">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -418,6 +456,53 @@
 
     <script>
         let currentRecordId = null;
+
+        // ===== 複数品種管理関数 =====
+        function addVarietyRow() {
+            const tbody = document.getElementById('varieties-tbody');
+            const rowCount = tbody.rows.length + 1;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${rowCount}</td>
+                <td><input type="text" class="variety-name" placeholder="品種名" style="width: 100%;"></td>
+                <td><input type="number" class="planting-area" step="0.1" placeholder="面積" style="width: 100%;" onchange="updateTotals()"></td>
+                <td><input type="number" class="plant-count-10a" placeholder="株数" style="width: 100%;"></td>
+                <td><input type="number" class="expected-yield-10a" step="0.1" placeholder="反収" style="width: 100%;" onchange="updateTotals()"></td>
+                <td><input type="number" class="expected-yield-total" readonly placeholder="自動計算" style="width: 100%; background: #f0f0f0; font-weight: 600;"></td>
+                <td><button class="btn-remove" onclick="removeRow(this)">削除</button></td>
+            `;
+            tbody.appendChild(newRow);
+            updateTotals();
+        }
+
+        function updateTotals() {
+            const rows = document.querySelectorAll('#varieties-tbody tr');
+            let totalArea = 0;
+            let totalYield = 0;
+
+            rows.forEach((row, index) => {
+                const noCell = row.cells[0];
+                noCell.textContent = index + 1;
+
+                const area = parseFloat(row.querySelector('.planting-area')?.value) || 0;
+                const yieldPer10a = parseFloat(row.querySelector('.expected-yield-10a')?.value) || 0;
+
+                // 予想収量 = 作付面積(a) × 予想反収(kg/10a) / 10
+                const yield = area * yieldPer10a / 10;
+                const yieldInput = row.querySelector('.expected-yield-total');
+                if (yieldInput) {
+                    yieldInput.value = yield > 0 ? yield.toFixed(1) : '';
+                }
+
+                totalArea += area;
+                totalYield += yield;
+            });
+
+            const totalAreaInput = document.getElementById('total-planting-area');
+            const totalYieldInput = document.getElementById('total-expected-yield');
+            if (totalAreaInput) totalAreaInput.value = totalArea > 0 ? totalArea.toFixed(1) : '';
+            if (totalYieldInput) totalYieldInput.value = totalYield > 0 ? totalYield.toFixed(1) : '';
+        }
 
         // タブ切り替え
         function switchTab(index) {
