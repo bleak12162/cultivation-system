@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>栽培履歴管理システム</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .header { background: linear-gradient(135deg, #5f72bd 0%, #9b23ea 100%); color: white; padding: 30px; text-align: center; }
+        .tabs { display: flex; background: #f5f5f5; border-bottom: 2px solid #ddd; }
+        .tab { flex: 1; padding: 18px; text-align: center; cursor: pointer; background: #e0e0e0; border: none; font-size: 16px; font-weight: bold; }
+        .tab.active { background: white; color: #5f72bd; border-bottom: 3px solid #5f72bd; }
+        .tab-content { display: none; padding: 30px; }
+        .tab-content.active { display: block; }
+        .section { margin-bottom: 20px; padding: 20px; background: #f9f9f9; border-radius: 8px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; }
+        label { font-weight: 600; margin-bottom: 5px; }
+        input, select, textarea { padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { background: #5f72bd; color: white; padding: 10px; }
+        td { padding: 8px; border: 1px solid #ddd; }
+        .btn { padding: 12px 30px; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-secondary { background: white; color: #5f72bd; border: 2px solid #5f72bd; }
+        .action-buttons { padding: 20px; text-align: center; background: #f5f5f5; }
+        .record-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin: 10px 0; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 8px; color: white; z-index: 1000; }
+        .notification.success { background: #27ae60; }
+        .notification.error { background: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌱 栽培履歴管理システム</h1>
+            <p>コープ自然派事業連合 | 2024年度</p>
+        </div>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab(0)">📝 新規登録</button>
+            <button class="tab" onclick="switchTab(1)">📋 履歴一覧</button>
+        </div>
+        <div class="tab-content active">
+            <div class="section">
+                <h3>基本情報</h3>
+                <div class="form-grid">
+                    <div class="form-group"><label>記入者</label><input type="text" id="recorder_name"></div>
+                    <div class="form-group"><label>生産者</label><input type="text" id="producer_name"></div>
+                    <div class="form-group"><label>商品名</label><input type="text" id="product_name"></div>
+                    <div class="form-group"><label>規格</label><input type="text" id="product_spec"></div>
+                </div>
+            </div>
+            <div class="section">
+                <h3>肥料使用履歴</h3>
+                <table id="fertilizer-table">
+                    <thead><tr><th>施用日</th><th>資材名</th><th>量(kg)</th><th>削除</th></tr></thead>
+                    <tbody><tr>
+                        <td><input type="date" class="fert-date"></td>
+                        <td><input type="text" class="fert-name"></td>
+                        <td><input type="number" class="fert-amount"></td>
+                        <td><button class="btn-secondary" onclick="removeRow(this)">削除</button></td>
+                    </tr></tbody>
+                </table>
+                <button class="btn-success" onclick="addFertilizerRow()">+ 追加</button>
+            </div>
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="saveRecord()">💾 保存</button>
+                <button class="btn btn-primary" onclick="generatePDF()">📄 PDF</button>
+                <button class="btn btn-secondary" onclick="generateExcel()">📊 Excel</button>
+            </div>
+        </div>
+        <div class="tab-content">
+            <div id="records-container"></div>
+        </div>
+    </div>
+    <script>
+        let currentId = null;
+        function switchTab(i) {
+            document.querySelectorAll('.tab').forEach((t, idx) => t.classList.toggle('active', idx === i));
+            document.querySelectorAll('.tab-content').forEach((c, idx) => c.classList.toggle('active', idx === i));
+            if (i === 1) loadRecords();
+        }
+        function addFertilizerRow() {
+            const tbody = document.querySelector('#fertilizer-table tbody');
+            tbody.insertAdjacentHTML('beforeend', `<tr>
+                <td><input type="date" class="fert-date"></td>
+                <td><input type="text" class="fert-name"></td>
+                <td><input type="number" class="fert-amount"></td>
+                <td><button class="btn-secondary" onclick="removeRow(this)">削除</button></td>
+            </tr>`);
+        }
+        function removeRow(btn) { if(confirm('削除しますか?')) btn.closest('tr').remove(); }
+        function showNotification(msg, type = 'success') {
+            const n = document.createElement('div');
+            n.className = `notification ${type}`;
+            n.textContent = msg;
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3000);
+        }
+        function collectData() {
+            const fertilizers = [];
+            document.querySelectorAll('#fertilizer-table tbody tr').forEach(row => {
+                const date = row.querySelector('.fert-date')?.value;
+                const name = row.querySelector('.fert-name')?.value;
+                if (date || name) fertilizers.push({date, name, amount: row.querySelector('.fert-amount')?.value});
+            });
+            return {
+                id: currentId || Date.now(),
+                timestamp: new Date().toISOString(),
+                recorder_name: document.getElementById('recorder_name').value,
+                producer_name: document.getElementById('producer_name').value,
+                product_name: document.getElementById('product_name').value,
+                product_spec: document.getElementById('product_spec').value,
+                fertilizers
+            };
+        }
+        function saveRecord() {
+            const data = collectData();
+            if (!data.product_name) { showNotification('商品名を入力してください', 'error'); return; }
+            let records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
+            const idx = records.findIndex(r => r.id === data.id);
+            if (idx >= 0) records[idx] = data; else records.push(data);
+            localStorage.setItem('cultivationRecords', JSON.stringify(records));
+            showNotification('保存しました');
+            currentId = data.id;
+        }
+        function loadRecords() {
+            const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
+            const container = document.getElementById('records-container');
+            if (records.length === 0) {
+                container.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">保存された履歴がありません</p>';
+                return;
+            }
+            container.innerHTML = records.map(r => `
+                <div class="record-card">
+                    <h3>${r.product_name || '(商品名なし)'}</h3>
+                    <p>生産者: ${r.producer_name || '-'}</p>
+                    <p>保存: ${new Date(r.timestamp).toLocaleString('ja-JP')}</p>
+                    <button class="btn btn-primary" onclick="loadRecord(${r.id})">編集</button>
+                    <button class="btn btn-secondary" onclick="deleteRecord(${r.id})">削除</button>
+                </div>
+            `).join('');
+        }
+        function loadRecord(id) {
+            const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
+            const r = records.find(rec => rec.id === id);
+            if (!r) return;
+            currentId = id;
+            document.getElementById('recorder_name').value = r.recorder_name || '';
+            document.getElementById('producer_name').value = r.producer_name || '';
+            document.getElementById('product_name').value = r.product_name || '';
+            document.getElementById('product_spec').value = r.product_spec || '';
+            const tbody = document.querySelector('#fertilizer-table tbody');
+            tbody.innerHTML = '';
+            (r.fertilizers || []).forEach(f => {
+                addFertilizerRow();
+                const row = tbody.lastElementChild;
+                row.querySelector('.fert-date').value = f.date || '';
+                row.querySelector('.fert-name').value = f.name || '';
+                row.querySelector('.fert-amount').value = f.amount || '';
+            });
+            if (tbody.rows.length === 0) addFertilizerRow();
+            switchTab(0);
+            showNotification('読み込みました');
+        }
+        function deleteRecord(id) {
+            if (!confirm('削除しますか?')) return;
+            let records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
+            records = records.filter(r => r.id !== id);
+            localStorage.setItem('cultivationRecords', JSON.stringify(records));
+            if (currentId === id) currentId = null;
+            loadRecords();
+            showNotification('削除しました');
+        }
+        function generatePDF() {
+            showNotification('PDF生成は準備中です', 'error');
+        }
+        function generateExcel() {
+            const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
+            if (records.length === 0) { showNotification('データがありません', 'error'); return; }
+            const ws = XLSX.utils.json_to_sheet(records.map(r => ({
+                '商品名': r.product_name,
+                '生産者': r.producer_name,
+                '記入者': r.recorder_name,
+                '規格': r.product_spec,
+                '保存日時': new Date(r.timestamp).toLocaleString('ja-JP')
+            })));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, '栽培履歴');
+            XLSX.writeFile(wb, `栽培履歴_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showNotification('Excel出力しました');
+        }
+    </script>
+</body>
+</html>
