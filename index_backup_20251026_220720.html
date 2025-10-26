@@ -724,64 +724,56 @@
         // データ保存
         async function saveRecord() {
             const data = collectFormData();
-
+            
             if (!data.recorder_name || !data.product_name) {
                 showNotification('必須項目を入力してください', 'error');
                 return;
             }
 
             try {
-                // localStorageから既存レコードを取得
-                const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
+                const url = currentRecordId 
+                    ? `/api/records?id=${currentRecordId}`
+                    : '/api/records';
+                const method = currentRecordId ? 'PUT' : 'POST';
 
-                if (currentRecordId) {
-                    // 既存レコードを更新
-                    const index = records.findIndex(r => r.id === currentRecordId);
-                    if (index !== -1) {
-                        records[index] = {
-                            ...records[index],
-                            ...data,
-                            updated_at: new Date().toISOString()
-                        };
-                    }
-                    showNotification('履歴を更新しました', 'success');
-                } else {
-                    // 新規レコードを作成
-                    const newRecord = {
-                        id: Math.max(...records.map(r => r.id || 0), 0) + 1,
-                        ...data,
-                        created_at: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
-                    };
-                    records.push(newRecord);
-                    currentRecordId = newRecord.id;
-                    showNotification('履歴を保存しました', 'success');
-                }
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
 
-                // localStorageに保存
-                localStorage.setItem('cultivationRecords', JSON.stringify(records));
+                if (!response.ok) throw new Error('保存に失敗しました');
+
+                const result = await response.json();
+                if (!currentRecordId) currentRecordId = result.id;
+
+                showNotification(currentRecordId ? '履歴を更新しました' : '履歴を保存しました');
             } catch (error) {
                 showNotification('エラー: ' + error.message, 'error');
             }
         }
 
         // レコード一覧読み込み
-        function loadRecords() {
+        async function loadRecords() {
             try {
-                const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
-                const container = document.getElementById('records-container');
+                const response = await fetch('/api/records');
+                if (!response.ok) throw new Error('データ取得に失敗しました');
 
+                const records = await response.json();
+                const container = document.getElementById('records-container');
+                
                 if (records.length === 0) {
                     container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">保存された履歴がありません</p>';
                     return;
                 }
 
                 container.innerHTML = records.map(record => {
+                    const data = record.data || record;
                     return `
                     <div class="record-card">
-                        <h3>${record.product_name || '(商品名なし)'}</h3>
-                        <p><strong>生産者:</strong> ${record.producer_name || '-'}</p>
-                        <p><strong>記入者:</strong> ${record.recorder_name || '-'}</p>
+                        <h3>${data.product_name || '(商品名なし)'}</h3>
+                        <p><strong>生産者:</strong> ${data.producer_name || '-'}</p>
+                        <p><strong>記入者:</strong> ${data.recorder_name || '-'}</p>
                         <p><strong>保存日時:</strong> ${new Date(record.created_at).toLocaleString('ja-JP')}</p>
                         <div class="record-actions">
                             <button class="btn btn-secondary" onclick="loadRecord(${record.id})">✏️ 編集</button>
@@ -796,15 +788,15 @@
         }
 
         // レコード読み込み
-        function loadRecord(id) {
+        async function loadRecord(id) {
             try {
-                const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
-                const record = records.find(r => r.id === id);
+                const response = await fetch(`/api/records?id=${id}`);
+                if (!response.ok) throw new Error('データ取得に失敗しました');
 
-                if (!record) {
-                    showNotification('レコードが見つかりません', 'error');
-                    return;
-                }
+                const result = await response.json();
+                const record = result.data || result;
+                
+                if (!record) return;
 
                 currentRecordId = id;
                 
@@ -885,20 +877,22 @@
         }
 
         // レコード削除
-        function deleteRecord(id) {
+        async function deleteRecord(id) {
             if (!confirm('この履歴を削除しますか?')) return;
-
+            
             try {
-                let records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
-                records = records.filter(r => r.id !== id);
-                localStorage.setItem('cultivationRecords', JSON.stringify(records));
+                const response = await fetch(`/api/records?id=${id}`, {
+                    method: 'DELETE'
+                });
 
+                if (!response.ok) throw new Error('削除に失敗しました');
+                
                 if (currentRecordId === id) {
                     currentRecordId = null;
                 }
-
+                
                 loadRecords();
-                showNotification('履歴を削除しました', 'success');
+                showNotification('履歴を削除しました');
             } catch (error) {
                 showNotification('エラー: ' + error.message, 'error');
             }
