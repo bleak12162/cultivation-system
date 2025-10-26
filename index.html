@@ -1123,8 +1123,15 @@
 
         // PDF用HTMLを生成（2ページ構成）
         function generatePDFHTML(data) {
-            const today = new Date().toLocaleDateString('ja-JP');
-            
+            const now = new Date();
+            const today = now.toLocaleDateString('ja-JP');
+
+            // 農業年度を計算（4月1日～3月31日基準）
+            let fiscalYear = now.getFullYear();
+            if (now.getMonth() < 3) { // 1月～3月
+              fiscalYear--; // 前年度
+            }
+
             // 作業種別の色
             const getWorkColor = (type) => {
                 const colors = {
@@ -1179,7 +1186,7 @@
     <!-- ページ1：表面 -->
     <div class="page">
         <div class="header">
-            <div class="header-title">🌱 栽培管理カード（野菜用 1/2）2024年度</div>
+            <div class="header-title">🌱 栽培管理カード（野菜用 1/2）${fiscalYear}年度</div>
             <div class="header-org">
                 生活協同組合連合会<br>
                 <strong>コープ自然派事業連合</strong><br>
@@ -1283,7 +1290,7 @@
     <!-- ページ2：裏面 -->
     <div class="page">
         <div class="header">
-            <div class="header-title">🌱 栽培管理カード（野菜用 2/2）2024年度</div>
+            <div class="header-title">🌱 栽培管理カード（野菜用 2/2）${fiscalYear}年度</div>
             <div class="header-org">
                 記入日　${today}<br>
                 生活協同組合連合会<br>
@@ -1384,7 +1391,7 @@
         
         <!-- タイムライン -->
         <div class="timeline-container">
-            <div class="timeline-title">年間作業タイムライン（2024年度）</div>
+            <div class="timeline-title">年間作業タイムライン（${fiscalYear}年度）</div>
             
             <!-- 月ヘッダー -->
             <div class="timeline-grid" style="margin-bottom: 3px;">
