@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>栽培管理カード（PDF出力用）</title>
+    <style>
+        @page { size: A4; margin: 12mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Yu Gothic', 'Meiryo', sans-serif; font-size: 9.5pt; line-height: 1.5; color: #1a1a1a; }
+        .page { width: 210mm; background: white; page-break-after: always; padding: 10mm; }
+        .header { background: linear-gradient(135deg, #4a8f4f 0%, #6ab76e 100%); color: white; border-radius: 6px; padding: 12px 15px; margin-bottom: 12px; }
+        .header-title { font-size: 17pt; font-weight: 600; margin-bottom: 4px; }
+        .header-org { position: absolute; right: 15px; top: 12px; font-size: 8.5pt; text-align: right; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 10px; font-size: 9pt; border-radius: 4px; }
+        th, td { border: 1px solid #d0d0d0; padding: 6px 8px; }
+        th { background: linear-gradient(180deg, #5a9f5f 0%, #4a8f4f 100%); color: white; font-weight: 600; text-align: center; font-size: 8.5pt; }
+        .label-cell { background: linear-gradient(135deg, #e8f5e9 0%, #dcedc8 100%); font-weight: 600; width: 20%; text-align: center; color: #2e7d32; font-size: 9pt; }
+        .value-cell { background-color: white; padding-left: 10px; color: #1a1a1a; }
+        .section-title { background: linear-gradient(135deg, #66bb6a 0%, #4caf50 100%); color: white; border-radius: 4px; padding: 8px 12px; font-weight: 600; font-size: 10.5pt; margin-top: 12px; margin-bottom: 6px; }
+        .detail-table { font-size: 8pt; }
+        .detail-table th { font-size: 7.5pt; padding: 4px 3px; }
+        .detail-table td { height: 24px; padding: 4px; vertical-align: middle; }
+        .detail-table .no-col { width: 32px; text-align: center; background: linear-gradient(135deg, #f1f8f4 0%, #e8f5e9 100%); font-weight: 600; color: #388e3c; }
+    </style>
+</head>
+<body id="pdf-content">
+    <!-- PDFコンテンツがここに動的に挿入される -->
+</body>
+</html>

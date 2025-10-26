@@ -595,8 +595,11 @@
         // PDF生成
         function generatePDF() {
             const data = collectFormData();
-            showNotification('PDF生成機能は開発中です', 'error');
-            console.log('PDF生成データ:', data);
+            if (!data.recorder_name || !data.product_name) {
+                showNotification('必須項目を入力してください', 'error');
+                return;
+            }
+            generatePDFFromData(data);
         }
 
         // レコードのPDF生成
@@ -604,9 +607,200 @@
             const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
             const record = records.find(r => r.id === id);
             if (record) {
-                showNotification('PDF生成機能は開発中です', 'error');
-                console.log('PDF生成データ:', record);
+                generatePDFFromData(record);
             }
+        }
+
+        // PDFを生成して表示
+        function generatePDFFromData(data) {
+            const printWindow = window.open('', '_blank');
+            const html = generatePDFHTML(data);
+            printWindow.document.write(html);
+            printWindow.document.close();
+            
+            setTimeout(() => {
+                printWindow.print();
+                showNotification('印刷ダイアログを開きました。「PDFに保存」を選択してください');
+            }, 500);
+        }
+
+        // PDF用HTMLを生成
+        function generatePDFHTML(data) {
+            const today = new Date().toLocaleDateString('ja-JP');
+            return `
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>栽培管理カード - ${data.product_name || '未入力'}</title>
+    <style>
+        @page { size: A4; margin: 12mm; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Yu Gothic', 'Meiryo', sans-serif; font-size: 9pt; line-height: 1.4; color: #1a1a1a; }
+        .page { padding: 15px; }
+        .header { background: linear-gradient(135deg, #4a8f4f 0%, #6ab76e 100%); color: white; border-radius: 6px; padding: 12px 15px; margin-bottom: 12px; position: relative; }
+        .header-title { font-size: 16pt; font-weight: 600; margin-bottom: 4px; }
+        .header-org { position: absolute; right: 15px; top: 12px; font-size: 8pt; text-align: right; line-height: 1.4; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 8.5pt; }
+        th, td { border: 1px solid #d0d0d0; padding: 5px 7px; }
+        th { background: #4a8f4f; color: white; font-weight: 600; text-align: center; font-size: 8pt; }
+        .label-cell { background: #e8f5e9; font-weight: 600; width: 20%; text-align: center; color: #2e7d32; }
+        .value-cell { background-color: white; padding-left: 10px; }
+        .section-title { background: #4caf50; color: white; border-radius: 4px; padding: 6px 10px; font-weight: 600; font-size: 10pt; margin-top: 10px; margin-bottom: 5px; }
+        .detail-table th { font-size: 7pt; padding: 3px; }
+        .detail-table td { padding: 3px; font-size: 7.5pt; }
+        .no-col { width: 30px; text-align: center; background: #f1f8f4; font-weight: 600; }
+        .note { font-size: 7pt; color: #555; margin-top: 3px; padding: 4px 8px; background: #fff8e1; border-left: 3px solid #ffa726; }
+        @media print { body { -webkit-print-color-adjust: exact; print-color-adjust: exact; } }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <div class="header-title">🌱 栽培管理カード（野菜用）2024年度</div>
+            <div class="header-org">
+                生活協同組合連合会<br>
+                <strong>コープ自然派事業連合</strong><br>
+                FAX 078-998-0851
+            </div>
+        </div>
+        
+        <!-- 記入者・生産者情報 -->
+        <table>
+            <tr>
+                <td class="label-cell">記入者<br>（確認責任者）</td>
+                <td class="value-cell" colspan="2"><strong>${data.recorder_name || ''}</strong></td>
+                <td class="label-cell">所属団体</td>
+                <td class="value-cell">${data.recorder_org || ''}</td>
+                <td class="label-cell">生産者名<br>（栽培責任者）</td>
+                <td class="value-cell" colspan="2"><strong>${data.producer_name || ''}</strong></td>
+                <td class="label-cell">所属団体</td>
+                <td class="value-cell">${data.producer_org || ''}</td>
+            </tr>
+            <tr>
+                <td class="label-cell">住所</td>
+                <td class="value-cell" colspan="4">${data.recorder_address || ''}</td>
+                <td class="label-cell">電話番号<br>FAX番号</td>
+                <td class="value-cell" colspan="4">
+                    Tel: ${data.recorder_tel || ''}<br>
+                    Fax: ${data.recorder_fax || ''}
+                </td>
+            </tr>
+        </table>
+        
+        <!-- 商品情報 -->
+        <table>
+            <tr>
+                <th colspan="2">商品名</th>
+                <th>規格</th>
+                <th>栽培品種</th>
+                <th>作付面積</th>
+                <th>栽植株数</th>
+                <th>予想収量</th>
+                <th>作型</th>
+            </tr>
+            <tr>
+                <td colspan="2"><strong>${data.product_name || ''}</strong></td>
+                <td>${data.product_spec || ''}</td>
+                <td>${data.cultivation_variety || ''}</td>
+                <td>${data.planting_area || ''}㎡</td>
+                <td>${data.plant_count || ''}株</td>
+                <td>${data.expected_yield || ''}kg</td>
+                <td>${data.cultivation_type || ''}</td>
+            </tr>
+        </table>
+        
+        <!-- 種子と育苗 -->
+        <div class="section-title">種子と育苗</div>
+        <table>
+            <tr>
+                <td class="label-cell">種子</td>
+                <td class="value-cell">${data.seed_type === 'purchase' ? '購入' : data.seed_type === 'self' ? '自家採種' : ''}</td>
+                <td class="label-cell">種子購入先</td>
+                <td class="value-cell">${data.seed_supplier || ''}</td>
+                <td class="label-cell">育苗</td>
+                <td class="value-cell">${data.seedling_method === 'self' ? '自家育苗' : data.seedling_method === 'purchase' ? '購入' : data.seedling_method || ''}</td>
+            </tr>
+        </table>
+        
+        <!-- 肥料使用履歴 -->
+        <div class="section-title">肥料及び土壌改良資材</div>
+        <table class="detail-table">
+            <thead>
+                <tr>
+                    <th class="no-col">No.</th>
+                    <th>施用日</th>
+                    <th>使用資材名称</th>
+                    <th>原料</th>
+                    <th>製造メーカー</th>
+                    <th>施用量<br>kg/10a</th>
+                    <th>備考</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${(data.fertilizers || []).map((f, i) => `
+                <tr>
+                    <td class="no-col">${i + 1}</td>
+                    <td>${f.date || ''}</td>
+                    <td>${f.name || ''}</td>
+                    <td>${f.material || ''}</td>
+                    <td>${f.maker || ''}</td>
+                    <td>${f.amount || ''}</td>
+                    <td>${f.notes || ''}</td>
+                </tr>
+                `).join('') || '<tr><td colspan="7" style="text-align:center;">データなし</td></tr>'}
+            </tbody>
+        </table>
+        <div class="note">※県基準慣行的化学合成N（窒素成分）使用量：18kg/10a</div>
+        
+        <!-- 農薬使用履歴 -->
+        <div class="section-title">病害虫防除・除草・成長調整資材</div>
+        <table class="detail-table">
+            <thead>
+                <tr>
+                    <th class="no-col">No.</th>
+                    <th>使用日</th>
+                    <th>使用農薬<br>資材名称</th>
+                    <th>成分名<br>または原料</th>
+                    <th>製造<br>メーカー</th>
+                    <th>希釈率<br>使用量</th>
+                    <th>対象病害虫</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${(data.pesticides || []).map((p, i) => `
+                <tr>
+                    <td class="no-col">${i + 1}</td>
+                    <td>${p.date || ''}</td>
+                    <td>${p.name || ''}</td>
+                    <td>${p.ingredient || ''}</td>
+                    <td>${p.maker || ''}</td>
+                    <td>${p.dilution || ''}</td>
+                    <td>${p.target || ''}</td>
+                </tr>
+                `).join('') || '<tr><td colspan="7" style="text-align:center;">データなし</td></tr>'}
+            </tbody>
+        </table>
+        <div class="note">※県基準慣行的農薬成分使用回数（12）回</div>
+        
+        <!-- 前作物情報 -->
+        <div class="section-title">前作物調査</div>
+        <table>
+            <tr>
+                <td class="label-cell">前作物名</td>
+                <td class="value-cell">${data.prev_crop_name || ''}</td>
+                <td class="label-cell">栽培区分</td>
+                <td class="value-cell">${data.cultivation_class === 'organic' ? '有機栽培' : data.cultivation_class === 'special' ? '特別栽培' : data.cultivation_class === 'normal' ? '慣行栽培' : ''}</td>
+            </tr>
+        </table>
+        
+        <div style="margin-top: 20px; text-align: right; font-size: 8pt; color: #666;">
+            作成日: ${today}
+        </div>
+    </div>
+</body>
+</html>
+            `;
         }
 
         // Excel出力
