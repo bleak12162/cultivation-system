@@ -264,6 +264,127 @@
                     </div>
                 </div>
             </div>
+
+            <!-- 作業記録（栽培工程表） -->
+            <div class="section">
+                <div class="section-title">📅 作業記録（栽培工程表）</div>
+                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                    日々の農作業を記録します。作業を追加すると、下部のタイムラインに自動的に表示されます。
+                </p>
+                <div class="table-section">
+                    <table id="work-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">No.</th>
+                                <th style="width: 120px;">作業種別</th>
+                                <th style="width: 180px;">作業内容</th>
+                                <th style="width: 110px;">開始日</th>
+                                <th style="width: 110px;">終了日</th>
+                                <th style="width: 100px;">関連肥料No.</th>
+                                <th style="width: 100px;">関連農薬No.</th>
+                                <th style="width: 150px;">備考</th>
+                                <th style="width: 60px;">削除</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>
+                                    <select class="work-type" onchange="updateWorkTimeline()">
+                                        <option value="">選択</option>
+                                        <option value="seeding">播種・育苗</option>
+                                        <option value="planting">定植</option>
+                                        <option value="fertilizer">施肥</option>
+                                        <option value="pest-control">防除</option>
+                                        <option value="harvest">収穫</option>
+                                        <option value="weeding">除草</option>
+                                        <option value="pruning">整枝・剪定</option>
+                                        <option value="watering">灌水</option>
+                                        <option value="other">その他</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="work-content" placeholder="例:トマト苗定植" onchange="updateWorkTimeline()"></td>
+                                <td><input type="date" class="work-start" onchange="updateWorkTimeline()"></td>
+                                <td><input type="date" class="work-end" onchange="updateWorkTimeline()"></td>
+                                <td><input type="text" class="work-fert-ref" placeholder="①,②"></td>
+                                <td><input type="text" class="work-pest-ref" placeholder="①,②"></td>
+                                <td><input type="text" class="work-notes"></td>
+                                <td><button class="btn-remove" onclick="removeRow(this); updateWorkTimeline();">削除</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn-add-row" onclick="addWorkRow()">+ 作業を追加</button>
+                </div>
+
+                <!-- タイムラインビジュアル -->
+                <div style="margin-top: 30px; padding: 20px; background: #fafafa; border-radius: 8px; border: 2px solid #e0e0e0;">
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: #5f72bd;">📅 年間作業タイムライン</h3>
+                    
+                    <!-- 月ヘッダー -->
+                    <div style="display: grid; grid-template-columns: 100px repeat(12, 1fr); gap: 0; margin-bottom: 5px;">
+                        <div style="padding: 8px; font-weight: bold; text-align: center;"></div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">1月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">2月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">3月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">4月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">5月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">6月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">7月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">8月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">9月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">10月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">11月</div>
+                        <div style="padding: 8px; font-weight: bold; text-align: center; font-size: 12px; border-left: 1px solid #ddd;">12月</div>
+                    </div>
+                    
+                    <!-- タイムライン表示エリア -->
+                    <div id="work-timeline" style="min-height: 150px;">
+                        <div style="text-align: center; padding: 40px; color: #999;">
+                            作業を入力すると、ここにタイムラインが表示されます
+                        </div>
+                    </div>
+                    
+                    <!-- 凡例 -->
+                    <div style="margin-top: 20px; padding: 15px; background: white; border-radius: 6px; display: flex; gap: 20px; flex-wrap: wrap; font-size: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #4caf50; border-radius: 3px;"></div>
+                            <span>播種・育苗</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #2196f3; border-radius: 3px;"></div>
+                            <span>定植</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #ff9800; border-radius: 3px;"></div>
+                            <span>施肥</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #e91e63; border-radius: 3px;"></div>
+                            <span>防除</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #f44336; border-radius: 3px;"></div>
+                            <span>収穫</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #8bc34a; border-radius: 3px;"></div>
+                            <span>除草</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #00bcd4; border-radius: 3px;"></div>
+                            <span>整枝・剪定</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #03a9f4; border-radius: 3px;"></div>
+                            <span>灌水</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <div style="width: 20px; height: 20px; background: #9e9e9e; border-radius: 3px;"></div>
+                            <span>その他</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             
             <div class="action-buttons">
                 <button class="btn btn-success" onclick="saveRecord()">💾 保存</button>
@@ -354,6 +475,144 @@
             table.insertAdjacentHTML('beforeend', newRow);
         }
 
+        // 作業記録行追加
+        function addWorkRow() {
+            const table = document.querySelector('#work-table tbody');
+            const rowCount = table.rows.length + 1;
+            const newRow = `
+                <tr>
+                    <td>${rowCount}</td>
+                    <td>
+                        <select class="work-type" onchange="updateWorkTimeline()">
+                            <option value="">選択</option>
+                            <option value="seeding">播種・育苗</option>
+                            <option value="planting">定植</option>
+                            <option value="fertilizer">施肥</option>
+                            <option value="pest-control">防除</option>
+                            <option value="harvest">収穫</option>
+                            <option value="weeding">除草</option>
+                            <option value="pruning">整枝・剪定</option>
+                            <option value="watering">灌水</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </td>
+                    <td><input type="text" class="work-content" onchange="updateWorkTimeline()"></td>
+                    <td><input type="date" class="work-start" onchange="updateWorkTimeline()"></td>
+                    <td><input type="date" class="work-end" onchange="updateWorkTimeline()"></td>
+                    <td><input type="text" class="work-fert-ref"></td>
+                    <td><input type="text" class="work-pest-ref"></td>
+                    <td><input type="text" class="work-notes"></td>
+                    <td><button class="btn-remove" onclick="removeRow(this); updateWorkTimeline();">削除</button></td>
+                </tr>
+            `;
+            table.insertAdjacentHTML('beforeend', newRow);
+        }
+
+        // 作業種別の色を取得
+        function getWorkTypeColor(type) {
+            const colors = {
+                'seeding': '#4caf50',      // 緑
+                'planting': '#2196f3',     // 青
+                'fertilizer': '#ff9800',   // オレンジ
+                'pest-control': '#e91e63', // ピンク
+                'harvest': '#f44336',      // 赤
+                'weeding': '#8bc34a',      // ライトグリーン
+                'pruning': '#00bcd4',      // シアン
+                'watering': '#03a9f4',     // ライトブルー
+                'other': '#9e9e9e'         // グレー
+            };
+            return colors[type] || '#9e9e9e';
+        }
+
+        // 作業種別名を取得
+        function getWorkTypeName(type) {
+            const names = {
+                'seeding': '播種・育苗',
+                'planting': '定植',
+                'fertilizer': '施肥',
+                'pest-control': '防除',
+                'harvest': '収穫',
+                'weeding': '除草',
+                'pruning': '整枝・剪定',
+                'watering': '灌水',
+                'other': 'その他'
+            };
+            return names[type] || '';
+        }
+
+        // 作業タイムライン更新
+        function updateWorkTimeline() {
+            const table = document.querySelector('#work-table tbody');
+            const timeline = document.getElementById('work-timeline');
+            const rows = Array.from(table.rows);
+            
+            // データ収集
+            const works = [];
+            rows.forEach((row, index) => {
+                const cells = row.cells;
+                const workType = row.querySelector('.work-type')?.value;
+                const workContent = row.querySelector('.work-content')?.value;
+                const startDate = row.querySelector('.work-start')?.value;
+                const endDate = row.querySelector('.work-end')?.value;
+                
+                if (workType && startDate) {
+                    works.push({
+                        type: workType,
+                        content: workContent || getWorkTypeName(workType),
+                        startDate: new Date(startDate),
+                        endDate: endDate ? new Date(endDate) : new Date(startDate),
+                        index: index + 1
+                    });
+                }
+            });
+            
+            if (works.length === 0) {
+                timeline.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">作業を入力すると、ここにタイムラインが表示されます</div>';
+                return;
+            }
+            
+            // タイムライン描画
+            let html = '';
+            works.forEach(work => {
+                const startMonth = work.startDate.getMonth() + 1;
+                const endMonth = work.endDate.getMonth() + 1;
+                const color = getWorkTypeColor(work.type);
+                
+                html += '<div style="display: grid; grid-template-columns: 100px repeat(12, 1fr); gap: 0; margin-bottom: 8px; position: relative;">';
+                html += `<div style="padding: 8px; font-size: 12px; font-weight: 600; display: flex; align-items: center;">${work.content}</div>`;
+                
+                for (let month = 1; month <= 12; month++) {
+                    let cellContent = '';
+                    
+                    if (month >= startMonth && month <= endMonth) {
+                        const isStart = month === startMonth;
+                        const isEnd = month === endMonth;
+                        const borderRadius = isStart && isEnd ? '4px' : isStart ? '4px 0 0 4px' : isEnd ? '0 4px 4px 0' : '0';
+                        
+                        cellContent = `<div style="
+                            height: 30px; 
+                            background: ${color}; 
+                            border-radius: ${borderRadius};
+                            margin: 2px 0;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: 10px;
+                            color: white;
+                            font-weight: bold;
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                        ">${isStart ? '●' : ''}${isEnd ? '●' : ''}</div>`;
+                    }
+                    
+                    html += `<div style="padding: 4px; border-left: 1px solid #ddd;">${cellContent}</div>`;
+                }
+                
+                html += '</div>';
+            });
+            
+            timeline.innerHTML = html;
+        }
+
         // 行削除
         function removeRow(button) {
             if (confirm('この行を削除しますか?')) {
@@ -417,6 +676,23 @@
                 }
             });
 
+            const works = [];
+            document.querySelectorAll('#work-table tbody tr').forEach((row, index) => {
+                const workType = row.querySelector('.work-type')?.value;
+                const workContent = row.querySelector('.work-content')?.value;
+                if (workType || workContent) {
+                    works.push({
+                        type: workType,
+                        content: workContent,
+                        startDate: row.querySelector('.work-start')?.value,
+                        endDate: row.querySelector('.work-end')?.value,
+                        fertRef: row.querySelector('.work-fert-ref')?.value,
+                        pestRef: row.querySelector('.work-pest-ref')?.value,
+                        notes: row.querySelector('.work-notes')?.value
+                    });
+                }
+            });
+
             return {
                 id: currentRecordId || Date.now(),
                 timestamp: new Date().toISOString(),
@@ -440,7 +716,8 @@
                 prev_crop_name: document.getElementById('prev_crop_name').value,
                 cultivation_class: document.getElementById('cultivation_class').value,
                 fertilizers: fertilizers,
-                pesticides: pesticides
+                pesticides: pesticides,
+                works: works
             };
         }
 
@@ -573,6 +850,25 @@
                 });
                 if (pestTable.rows.length === 0) addPesticideRow();
 
+                // 作業記録テーブル
+                const workTable = document.querySelector('#work-table tbody');
+                workTable.innerHTML = '';
+                (record.works || []).forEach((work, i) => {
+                    addWorkRow();
+                    const row = workTable.rows[i];
+                    row.querySelector('.work-type').value = work.type || '';
+                    row.querySelector('.work-content').value = work.content || '';
+                    row.querySelector('.work-start').value = work.startDate || '';
+                    row.querySelector('.work-end').value = work.endDate || '';
+                    row.querySelector('.work-fert-ref').value = work.fertRef || '';
+                    row.querySelector('.work-pest-ref').value = work.pestRef || '';
+                    row.querySelector('.work-notes').value = work.notes || '';
+                });
+                if (workTable.rows.length === 0) addWorkRow();
+                
+                // タイムラインを更新
+                updateWorkTimeline();
+
                 switchTab(0);
                 showNotification('履歴を読み込みました');
             } catch (error) {
@@ -617,6 +913,13 @@
             const pestTable = document.querySelector('#pesticide-table tbody');
             pestTable.innerHTML = '';
             addPesticideRow();
+
+            const workTable = document.querySelector('#work-table tbody');
+            workTable.innerHTML = '';
+            addWorkRow();
+            
+            // タイムラインもクリア
+            updateWorkTimeline();
             
             currentRecordId = null;
             showNotification('フォームをクリアしました');
