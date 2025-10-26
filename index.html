@@ -3,197 +3,645 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>栽培履歴管理システム</title>
+    <title>栽培履歴管理システム - コープ自然派</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        body { font-family: 'Hiragino Sans', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden; }
         .header { background: linear-gradient(135deg, #5f72bd 0%, #9b23ea 100%); color: white; padding: 30px; text-align: center; }
-        .tabs { display: flex; background: #f5f5f5; border-bottom: 2px solid #ddd; }
-        .tab { flex: 1; padding: 18px; text-align: center; cursor: pointer; background: #e0e0e0; border: none; font-size: 16px; font-weight: bold; }
+        .header h1 { font-size: 28px; margin-bottom: 10px; }
+        .tabs { display: flex; background: #f5f5f5; border-bottom: 2px solid #ddd; overflow-x: auto; }
+        .tab { flex: 1; min-width: 150px; padding: 18px; text-align: center; cursor: pointer; background: #e0e0e0; border: none; font-size: 16px; font-weight: bold; transition: all 0.3s; color: #666; }
+        .tab:hover { background: #d0d0d0; }
         .tab.active { background: white; color: #5f72bd; border-bottom: 3px solid #5f72bd; }
-        .tab-content { display: none; padding: 30px; }
+        .tab-content { display: none; padding: 30px; animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
-        .section { margin-bottom: 20px; padding: 20px; background: #f9f9f9; border-radius: 8px; }
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section { margin-bottom: 35px; padding: 25px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #5f72bd; }
+        .section-title { font-size: 20px; color: #5f72bd; margin-bottom: 20px; font-weight: bold; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         .form-group { display: flex; flex-direction: column; }
-        label { font-weight: 600; margin-bottom: 5px; }
-        input, select, textarea { padding: 10px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #5f72bd; color: white; padding: 10px; }
-        td { padding: 8px; border: 1px solid #ddd; }
-        .btn { padding: 12px 30px; font-size: 14px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; margin: 5px; }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-success { background: #27ae60; color: white; }
+        .form-group.full-width { grid-column: 1 / -1; }
+        label { font-weight: 600; margin-bottom: 8px; color: #333; font-size: 14px; }
+        label .required { color: #e74c3c; margin-left: 4px; }
+        input[type="text"], input[type="date"], input[type="number"], select, textarea { padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 15px; transition: all 0.3s; font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #5f72bd; box-shadow: 0 0 0 3px rgba(95, 114, 189, 0.1); }
+        textarea { resize: vertical; min-height: 80px; }
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-top: 20px; }
+        th { background: #5f72bd; color: white; padding: 12px 8px; text-align: left; font-size: 13px; font-weight: 600; }
+        td { padding: 10px 8px; border-bottom: 1px solid #eee; }
+        td input, td select { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        .btn-add-row { margin-top: 10px; padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; transition: all 0.3s; }
+        .btn-add-row:hover { background: #229954; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3); }
+        .btn-remove { background: #e74c3c; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-remove:hover { background: #c0392b; }
+        .action-buttons { display: flex; gap: 15px; justify-content: center; padding: 30px; background: #f5f5f5; border-top: 2px solid #ddd; flex-wrap: wrap; }
+        .btn { padding: 15px 40px; font-size: 16px; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); }
         .btn-secondary { background: white; color: #5f72bd; border: 2px solid #5f72bd; }
-        .action-buttons { padding: 20px; text-align: center; background: #f5f5f5; }
-        .record-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin: 10px 0; }
-        .notification { position: fixed; top: 20px; right: 20px; padding: 15px; border-radius: 8px; color: white; z-index: 1000; }
+        .btn-secondary:hover { background: #5f72bd; color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-success:hover { background: #229954; transform: translateY(-3px); }
+        .radio-group { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+        .radio-group label { display: flex; align-items: center; gap: 6px; margin-bottom: 0; font-weight: normal; }
+        .radio-group input[type="radio"], .radio-group input[type="checkbox"] { width: auto; }
+        .records-list { padding: 30px; }
+        .record-card { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s; }
+        .record-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); transform: translateY(-2px); }
+        .record-card h3 { color: #5f72bd; margin-bottom: 10px; }
+        .record-card p { color: #666; margin: 5px 0; }
+        .record-actions { margin-top: 15px; display: flex; gap: 10px; }
+        .record-actions button { padding: 8px 16px; font-size: 14px; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; color: white; font-weight: bold; z-index: 1000; animation: slideIn 0.3s; }
         .notification.success { background: #27ae60; }
         .notification.error { background: #e74c3c; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @media (max-width: 768px) {
+            .tabs { flex-wrap: wrap; }
+            .tab { min-width: 50%; }
+            .form-grid { grid-template-columns: 1fr; }
+            .action-buttons { flex-direction: column; }
+            .btn { width: 100%; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🌱 栽培履歴管理システム</h1>
-            <p>コープ自然派事業連合 | 2024年度</p>
+            <h1>🌱 栽培履歴管理システム（野菜用）</h1>
+            <p>生活協同組合連合会 コープ自然派事業連合 | 2024年度</p>
         </div>
         <div class="tabs">
-            <button class="tab active" onclick="switchTab(0)">📝 新規登録</button>
+            <button class="tab active" onclick="switchTab(0)">📝 新規登録・編集</button>
             <button class="tab" onclick="switchTab(1)">📋 履歴一覧</button>
         </div>
+        
+        <!-- タブ1: 入力フォーム -->
         <div class="tab-content active">
             <div class="section">
-                <h3>基本情報</h3>
+                <div class="section-title">記入者情報</div>
                 <div class="form-grid">
-                    <div class="form-group"><label>記入者</label><input type="text" id="recorder_name"></div>
-                    <div class="form-group"><label>生産者</label><input type="text" id="producer_name"></div>
-                    <div class="form-group"><label>商品名</label><input type="text" id="product_name"></div>
-                    <div class="form-group"><label>規格</label><input type="text" id="product_spec"></div>
+                    <div class="form-group">
+                        <label>記入者（確認責任者）<span class="required">*</span></label>
+                        <input type="text" id="recorder_name" placeholder="山田太郎" required>
+                    </div>
+                    <div class="form-group">
+                        <label>所属団体</label>
+                        <input type="text" id="recorder_org" placeholder="○○農園">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>住所<span class="required">*</span></label>
+                        <input type="text" id="recorder_address" placeholder="大阪府吹田市...">
+                    </div>
+                    <div class="form-group">
+                        <label>電話番号</label>
+                        <input type="text" id="recorder_tel" placeholder="06-1234-5678">
+                    </div>
+                    <div class="form-group">
+                        <label>FAX番号</label>
+                        <input type="text" id="recorder_fax" placeholder="06-1234-5679">
+                    </div>
                 </div>
             </div>
             <div class="section">
-                <h3>肥料使用履歴</h3>
-                <table id="fertilizer-table">
-                    <thead><tr><th>施用日</th><th>資材名</th><th>量(kg)</th><th>削除</th></tr></thead>
-                    <tbody><tr>
-                        <td><input type="date" class="fert-date"></td>
-                        <td><input type="text" class="fert-name"></td>
-                        <td><input type="number" class="fert-amount"></td>
-                        <td><button class="btn-secondary" onclick="removeRow(this)">削除</button></td>
-                    </tr></tbody>
-                </table>
-                <button class="btn-success" onclick="addFertilizerRow()">+ 追加</button>
+                <div class="section-title">生産者情報</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>生産者名（栽培責任者）<span class="required">*</span></label>
+                        <input type="text" id="producer_name" placeholder="佐藤花子">
+                    </div>
+                    <div class="form-group">
+                        <label>所属団体</label>
+                        <input type="text" id="producer_org" placeholder="○○農園">
+                    </div>
+                </div>
             </div>
+            
+            <div class="section">
+                <div class="section-title">商品情報</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>商品名<span class="required">*</span></label>
+                        <input type="text" id="product_name" placeholder="ミニトマト">
+                    </div>
+                    <div class="form-group">
+                        <label>規格</label>
+                        <input type="text" id="product_spec" placeholder="150g">
+                    </div>
+                    <div class="form-group">
+                        <label>栽培品種</label>
+                        <input type="text" id="cultivation_variety" placeholder="アイコ">
+                    </div>
+                    <div class="form-group">
+                        <label>作付面積（㎡）</label>
+                        <input type="number" id="planting_area" step="0.1" placeholder="500">
+                    </div>
+                    <div class="form-group">
+                        <label>栽植株数</label>
+                        <input type="number" id="plant_count" placeholder="1000">
+                    </div>
+                    <div class="form-group">
+                        <label>予想収量（kg）</label>
+                        <input type="number" id="expected_yield" step="0.1" placeholder="1500">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>作型</label>
+                        <input type="text" id="cultivation_type" placeholder="例:促成栽培、抑制栽培など">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">種子・育苗情報</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>種子</label>
+                        <select id="seed_type">
+                            <option value="">選択してください</option>
+                            <option value="purchase">購入</option>
+                            <option value="self">自家採種</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>種子購入先</label>
+                        <input type="text" id="seed_supplier" placeholder="例:○○種苗店">
+                    </div>
+                    <div class="form-group">
+                        <label>育苗方法</label>
+                        <select id="seedling_method">
+                            <option value="">選択してください</option>
+                            <option value="self">自家育苗</option>
+                            <option value="purchase">購入</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <div class="section-title">肥料使用履歴</div>
+                <div class="table-section">
+                    <table id="fertilizer-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">No.</th>
+                                <th style="width: 100px;">施用日</th>
+                                <th style="width: 150px;">使用資材名称</th>
+                                <th style="width: 150px;">原料</th>
+                                <th style="width: 120px;">製造メーカー</th>
+                                <th style="width: 100px;">施用量(kg/10a)</th>
+                                <th style="width: 150px;">備考</th>
+                                <th style="width: 60px;">削除</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><input type="date" class="fert-date"></td>
+                                <td><input type="text" class="fert-name" placeholder="例:牛糞堆肥"></td>
+                                <td><input type="text" class="fert-material" placeholder="牛糞"></td>
+                                <td><input type="text" class="fert-maker"></td>
+                                <td><input type="number" class="fert-amount" step="0.1"></td>
+                                <td><input type="text" class="fert-notes"></td>
+                                <td><button class="btn-remove" onclick="removeRow(this)">削除</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn-add-row" onclick="addFertilizerRow()">+ 行を追加</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">農薬使用履歴</div>
+                <div class="table-section">
+                    <table id="pesticide-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 40px;">No.</th>
+                                <th style="width: 100px;">使用日</th>
+                                <th style="width: 150px;">使用農薬資材名称</th>
+                                <th style="width: 150px;">成分名</th>
+                                <th style="width: 120px;">製造メーカー</th>
+                                <th style="width: 100px;">希釈率・使用量</th>
+                                <th style="width: 100px;">対象病害虫</th>
+                                <th style="width: 60px;">削除</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td><input type="date" class="pest-date"></td>
+                                <td><input type="text" class="pest-name" placeholder="例:ニーム油"></td>
+                                <td><input type="text" class="pest-ingredient"></td>
+                                <td><input type="text" class="pest-maker"></td>
+                                <td><input type="text" class="pest-dilution" placeholder="例:500倍"></td>
+                                <td><input type="text" class="pest-target" placeholder="例:アブラムシ"></td>
+                                <td><button class="btn-remove" onclick="removeRow(this)">削除</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <button class="btn-add-row" onclick="addPesticideRow()">+ 行を追加</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">前作物情報</div>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>前作物名</label>
+                        <input type="text" id="prev_crop_name" placeholder="例:キャベツ">
+                    </div>
+                    <div class="form-group">
+                        <label>栽培区分</label>
+                        <select id="cultivation_class">
+                            <option value="">選択してください</option>
+                            <option value="organic">有機栽培</option>
+                            <option value="special">特別栽培</option>
+                            <option value="normal">慣行栽培</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
             <div class="action-buttons">
                 <button class="btn btn-success" onclick="saveRecord()">💾 保存</button>
-                <button class="btn btn-primary" onclick="generatePDF()">📄 PDF</button>
-                <button class="btn btn-secondary" onclick="generateExcel()">📊 Excel</button>
+                <button class="btn btn-primary" onclick="generatePDF()">📄 PDF生成</button>
+                <button class="btn btn-secondary" onclick="generateExcel()">📊 Excel出力</button>
+                <button class="btn btn-secondary" onclick="clearForm()">🔄 フォームクリア</button>
             </div>
         </div>
+        
+        <!-- タブ2: 履歴一覧 -->
         <div class="tab-content">
-            <div id="records-container"></div>
+            <div class="records-list">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: #5f72bd;">保存済み履歴</h2>
+                    <button class="btn btn-secondary" onclick="loadRecords()">🔄 更新</button>
+                </div>
+                <div id="records-container">
+                    <!-- レコード一覧がここに表示される -->
+                </div>
+            </div>
         </div>
     </div>
+
     <script>
-        let currentId = null;
-        function switchTab(i) {
-            document.querySelectorAll('.tab').forEach((t, idx) => t.classList.toggle('active', idx === i));
-            document.querySelectorAll('.tab-content').forEach((c, idx) => c.classList.toggle('active', idx === i));
-            if (i === 1) loadRecords();
+        let currentRecordId = null;
+
+        // タブ切り替え
+        function switchTab(index) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach((tab, i) => {
+                if (i === index) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            contents.forEach((content, i) => {
+                if (i === index) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+
+            if (index === 1) {
+                loadRecords();
+            }
         }
+
+        // 肥料行追加
         function addFertilizerRow() {
-            const tbody = document.querySelector('#fertilizer-table tbody');
-            tbody.insertAdjacentHTML('beforeend', `<tr>
-                <td><input type="date" class="fert-date"></td>
-                <td><input type="text" class="fert-name"></td>
-                <td><input type="number" class="fert-amount"></td>
-                <td><button class="btn-secondary" onclick="removeRow(this)">削除</button></td>
-            </tr>`);
+            const table = document.querySelector('#fertilizer-table tbody');
+            const rowCount = table.rows.length + 1;
+            const newRow = `
+                <tr>
+                    <td>${rowCount}</td>
+                    <td><input type="date" class="fert-date"></td>
+                    <td><input type="text" class="fert-name"></td>
+                    <td><input type="text" class="fert-material"></td>
+                    <td><input type="text" class="fert-maker"></td>
+                    <td><input type="number" class="fert-amount" step="0.1"></td>
+                    <td><input type="text" class="fert-notes"></td>
+                    <td><button class="btn-remove" onclick="removeRow(this)">削除</button></td>
+                </tr>
+            `;
+            table.insertAdjacentHTML('beforeend', newRow);
         }
-        function removeRow(btn) { if(confirm('削除しますか?')) btn.closest('tr').remove(); }
-        function showNotification(msg, type = 'success') {
-            const n = document.createElement('div');
-            n.className = `notification ${type}`;
-            n.textContent = msg;
-            document.body.appendChild(n);
-            setTimeout(() => n.remove(), 3000);
+
+        // 農薬行追加
+        function addPesticideRow() {
+            const table = document.querySelector('#pesticide-table tbody');
+            const rowCount = table.rows.length + 1;
+            const newRow = `
+                <tr>
+                    <td>${rowCount}</td>
+                    <td><input type="date" class="pest-date"></td>
+                    <td><input type="text" class="pest-name"></td>
+                    <td><input type="text" class="pest-ingredient"></td>
+                    <td><input type="text" class="pest-maker"></td>
+                    <td><input type="text" class="pest-dilution"></td>
+                    <td><input type="text" class="pest-target"></td>
+                    <td><button class="btn-remove" onclick="removeRow(this)">削除</button></td>
+                </tr>
+            `;
+            table.insertAdjacentHTML('beforeend', newRow);
         }
-        function collectData() {
+
+        // 行削除
+        function removeRow(button) {
+            if (confirm('この行を削除しますか?')) {
+                button.closest('tr').remove();
+                renumberRows();
+            }
+        }
+
+        // 行番号再採番
+        function renumberRows() {
+            document.querySelectorAll('table tbody').forEach(tbody => {
+                Array.from(tbody.rows).forEach((row, index) => {
+                    row.cells[0].textContent = index + 1;
+                });
+            });
+        }
+
+        // 通知表示
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // データ収集
+        function collectFormData() {
             const fertilizers = [];
-            document.querySelectorAll('#fertilizer-table tbody tr').forEach(row => {
+            document.querySelectorAll('#fertilizer-table tbody tr').forEach((row, index) => {
                 const date = row.querySelector('.fert-date')?.value;
                 const name = row.querySelector('.fert-name')?.value;
-                if (date || name) fertilizers.push({date, name, amount: row.querySelector('.fert-amount')?.value});
+                if (date || name) {
+                    fertilizers.push({
+                        date: date,
+                        name: name,
+                        material: row.querySelector('.fert-material')?.value,
+                        maker: row.querySelector('.fert-maker')?.value,
+                        amount: row.querySelector('.fert-amount')?.value,
+                        notes: row.querySelector('.fert-notes')?.value
+                    });
+                }
             });
+
+            const pesticides = [];
+            document.querySelectorAll('#pesticide-table tbody tr').forEach((row, index) => {
+                const date = row.querySelector('.pest-date')?.value;
+                const name = row.querySelector('.pest-name')?.value;
+                if (date || name) {
+                    pesticides.push({
+                        date: date,
+                        name: name,
+                        ingredient: row.querySelector('.pest-ingredient')?.value,
+                        maker: row.querySelector('.pest-maker')?.value,
+                        dilution: row.querySelector('.pest-dilution')?.value,
+                        target: row.querySelector('.pest-target')?.value
+                    });
+                }
+            });
+
             return {
-                id: currentId || Date.now(),
+                id: currentRecordId || Date.now(),
                 timestamp: new Date().toISOString(),
                 recorder_name: document.getElementById('recorder_name').value,
+                recorder_org: document.getElementById('recorder_org').value,
+                recorder_address: document.getElementById('recorder_address').value,
+                recorder_tel: document.getElementById('recorder_tel').value,
+                recorder_fax: document.getElementById('recorder_fax').value,
                 producer_name: document.getElementById('producer_name').value,
+                producer_org: document.getElementById('producer_org').value,
                 product_name: document.getElementById('product_name').value,
                 product_spec: document.getElementById('product_spec').value,
-                fertilizers
+                cultivation_variety: document.getElementById('cultivation_variety').value,
+                planting_area: document.getElementById('planting_area').value,
+                plant_count: document.getElementById('plant_count').value,
+                expected_yield: document.getElementById('expected_yield').value,
+                cultivation_type: document.getElementById('cultivation_type').value,
+                seed_type: document.getElementById('seed_type').value,
+                seed_supplier: document.getElementById('seed_supplier').value,
+                seedling_method: document.getElementById('seedling_method').value,
+                prev_crop_name: document.getElementById('prev_crop_name').value,
+                cultivation_class: document.getElementById('cultivation_class').value,
+                fertilizers: fertilizers,
+                pesticides: pesticides
             };
         }
+
+        // データ保存
         function saveRecord() {
-            const data = collectData();
-            if (!data.product_name) { showNotification('商品名を入力してください', 'error'); return; }
+            const data = collectFormData();
+            
+            if (!data.recorder_name || !data.product_name) {
+                showNotification('必須項目を入力してください', 'error');
+                return;
+            }
+
             let records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
-            const idx = records.findIndex(r => r.id === data.id);
-            if (idx >= 0) records[idx] = data; else records.push(data);
+            
+            const existingIndex = records.findIndex(r => r.id === data.id);
+            if (existingIndex >= 0) {
+                records[existingIndex] = data;
+                showNotification('履歴を更新しました');
+            } else {
+                records.push(data);
+                showNotification('履歴を保存しました');
+            }
+            
             localStorage.setItem('cultivationRecords', JSON.stringify(records));
-            showNotification('保存しました');
-            currentId = data.id;
+            currentRecordId = data.id;
         }
+
+        // レコード一覧読み込み
         function loadRecords() {
             const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
             const container = document.getElementById('records-container');
+            
             if (records.length === 0) {
-                container.innerHTML = '<p style="text-align:center;padding:40px;color:#999;">保存された履歴がありません</p>';
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">保存された履歴がありません</p>';
                 return;
             }
-            container.innerHTML = records.map(r => `
+
+            container.innerHTML = records.map(record => `
                 <div class="record-card">
-                    <h3>${r.product_name || '(商品名なし)'}</h3>
-                    <p>生産者: ${r.producer_name || '-'}</p>
-                    <p>保存: ${new Date(r.timestamp).toLocaleString('ja-JP')}</p>
-                    <button class="btn btn-primary" onclick="loadRecord(${r.id})">編集</button>
-                    <button class="btn btn-secondary" onclick="deleteRecord(${r.id})">削除</button>
+                    <h3>${record.product_name || '(商品名なし)'}</h3>
+                    <p><strong>生産者:</strong> ${record.producer_name || '-'}</p>
+                    <p><strong>記入者:</strong> ${record.recorder_name || '-'}</p>
+                    <p><strong>保存日時:</strong> ${new Date(record.timestamp).toLocaleString('ja-JP')}</p>
+                    <div class="record-actions">
+                        <button class="btn btn-secondary" onclick="loadRecord(${record.id})">✏️ 編集</button>
+                        <button class="btn btn-primary" onclick="generatePDFForRecord(${record.id})">📄 PDF</button>
+                        <button class="btn btn-remove" onclick="deleteRecord(${record.id})">🗑️ 削除</button>
+                    </div>
                 </div>
             `).join('');
         }
+
+        // レコード読み込み
         function loadRecord(id) {
             const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
-            const r = records.find(rec => rec.id === id);
-            if (!r) return;
-            currentId = id;
-            document.getElementById('recorder_name').value = r.recorder_name || '';
-            document.getElementById('producer_name').value = r.producer_name || '';
-            document.getElementById('product_name').value = r.product_name || '';
-            document.getElementById('product_spec').value = r.product_spec || '';
-            const tbody = document.querySelector('#fertilizer-table tbody');
-            tbody.innerHTML = '';
-            (r.fertilizers || []).forEach(f => {
+            const record = records.find(r => r.id === id);
+            
+            if (!record) return;
+
+            currentRecordId = id;
+            
+            document.getElementById('recorder_name').value = record.recorder_name || '';
+            document.getElementById('recorder_org').value = record.recorder_org || '';
+            document.getElementById('recorder_address').value = record.recorder_address || '';
+            document.getElementById('recorder_tel').value = record.recorder_tel || '';
+            document.getElementById('recorder_fax').value = record.recorder_fax || '';
+            document.getElementById('producer_name').value = record.producer_name || '';
+            document.getElementById('producer_org').value = record.producer_org || '';
+            document.getElementById('product_name').value = record.product_name || '';
+            document.getElementById('product_spec').value = record.product_spec || '';
+            document.getElementById('cultivation_variety').value = record.cultivation_variety || '';
+            document.getElementById('planting_area').value = record.planting_area || '';
+            document.getElementById('plant_count').value = record.plant_count || '';
+            document.getElementById('expected_yield').value = record.expected_yield || '';
+            document.getElementById('cultivation_type').value = record.cultivation_type || '';
+            document.getElementById('seed_type').value = record.seed_type || '';
+            document.getElementById('seed_supplier').value = record.seed_supplier || '';
+            document.getElementById('seedling_method').value = record.seedling_method || '';
+            document.getElementById('prev_crop_name').value = record.prev_crop_name || '';
+            document.getElementById('cultivation_class').value = record.cultivation_class || '';
+
+            // 肥料テーブル
+            const fertTable = document.querySelector('#fertilizer-table tbody');
+            fertTable.innerHTML = '';
+            (record.fertilizers || []).forEach((fert, i) => {
                 addFertilizerRow();
-                const row = tbody.lastElementChild;
-                row.querySelector('.fert-date').value = f.date || '';
-                row.querySelector('.fert-name').value = f.name || '';
-                row.querySelector('.fert-amount').value = f.amount || '';
+                const row = fertTable.rows[i];
+                row.querySelector('.fert-date').value = fert.date || '';
+                row.querySelector('.fert-name').value = fert.name || '';
+                row.querySelector('.fert-material').value = fert.material || '';
+                row.querySelector('.fert-maker').value = fert.maker || '';
+                row.querySelector('.fert-amount').value = fert.amount || '';
+                row.querySelector('.fert-notes').value = fert.notes || '';
             });
-            if (tbody.rows.length === 0) addFertilizerRow();
+            if (fertTable.rows.length === 0) addFertilizerRow();
+
+            // 農薬テーブル
+            const pestTable = document.querySelector('#pesticide-table tbody');
+            pestTable.innerHTML = '';
+            (record.pesticides || []).forEach((pest, i) => {
+                addPesticideRow();
+                const row = pestTable.rows[i];
+                row.querySelector('.pest-date').value = pest.date || '';
+                row.querySelector('.pest-name').value = pest.name || '';
+                row.querySelector('.pest-ingredient').value = pest.ingredient || '';
+                row.querySelector('.pest-maker').value = pest.maker || '';
+                row.querySelector('.pest-dilution').value = pest.dilution || '';
+                row.querySelector('.pest-target').value = pest.target || '';
+            });
+            if (pestTable.rows.length === 0) addPesticideRow();
+
             switchTab(0);
-            showNotification('読み込みました');
+            showNotification('履歴を読み込みました');
         }
+
+        // レコード削除
         function deleteRecord(id) {
-            if (!confirm('削除しますか?')) return;
+            if (!confirm('この履歴を削除しますか?')) return;
+            
             let records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
             records = records.filter(r => r.id !== id);
             localStorage.setItem('cultivationRecords', JSON.stringify(records));
-            if (currentId === id) currentId = null;
+            
+            if (currentRecordId === id) {
+                currentRecordId = null;
+            }
+            
             loadRecords();
-            showNotification('削除しました');
+            showNotification('履歴を削除しました');
         }
+
+        // フォームクリア
+        function clearForm() {
+            if (!confirm('入力内容をクリアしますか?')) return;
+            
+            document.querySelectorAll('input[type="text"], input[type="number"], input[type="date"], select, textarea').forEach(el => {
+                el.value = '';
+            });
+            
+            const fertTable = document.querySelector('#fertilizer-table tbody');
+            fertTable.innerHTML = '';
+            addFertilizerRow();
+            
+            const pestTable = document.querySelector('#pesticide-table tbody');
+            pestTable.innerHTML = '';
+            addPesticideRow();
+            
+            currentRecordId = null;
+            showNotification('フォームをクリアしました');
+        }
+
+        // PDF生成
         function generatePDF() {
-            showNotification('PDF生成は準備中です', 'error');
+            const data = collectFormData();
+            showNotification('PDF生成機能は開発中です', 'error');
+            console.log('PDF生成データ:', data);
         }
+
+        // レコードのPDF生成
+        function generatePDFForRecord(id) {
+            const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
+            const record = records.find(r => r.id === id);
+            if (record) {
+                showNotification('PDF生成機能は開発中です', 'error');
+                console.log('PDF生成データ:', record);
+            }
+        }
+
+        // Excel出力
         function generateExcel() {
             const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
-            if (records.length === 0) { showNotification('データがありません', 'error'); return; }
-            const ws = XLSX.utils.json_to_sheet(records.map(r => ({
-                '商品名': r.product_name,
-                '生産者': r.producer_name,
+            
+            if (records.length === 0) {
+                showNotification('出力するデータがありません', 'error');
+                return;
+            }
+
+            const worksheet = XLSX.utils.json_to_sheet(records.map(r => ({
                 '記入者': r.recorder_name,
+                '生産者': r.producer_name,
+                '商品名': r.product_name,
                 '規格': r.product_spec,
+                '品種': r.cultivation_variety,
+                '面積': r.planting_area,
+                '株数': r.plant_count,
+                '予想収量': r.expected_yield,
                 '保存日時': new Date(r.timestamp).toLocaleString('ja-JP')
             })));
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, '栽培履歴');
-            XLSX.writeFile(wb, `栽培履歴_${new Date().toISOString().split('T')[0]}.xlsx`);
-            showNotification('Excel出力しました');
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, '栽培履歴');
+            
+            XLSX.writeFile(workbook, `栽培履歴_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showNotification('Excelファイルをダウンロードしました');
         }
+
+        // 初期化
+        window.onload = function() {
+            addFertilizerRow();
+            addPesticideRow();
+        };
     </script>
 </body>
 </html>
