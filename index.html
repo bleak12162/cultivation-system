@@ -1261,7 +1261,7 @@
             <tbody>
                 ${(data.fertilizers || []).slice(0, 10).map((f, i) => `
                 <tr>
-                    <td class="no-col">①②③④⑤⑥⑦⑧⑨⑩'[i]</td>
+                    <td class="no-col">${i + 1}</td>
                     <td>${f.date || ''}</td>
                     <td>${f.name || ''}</td>
                     <td>${f.material || ''}</td>
@@ -1271,7 +1271,7 @@
                 </tr>
                 `).join('')}
                 ${Array.from({length: Math.max(0, 10 - (data.fertilizers || []).length)}).map((_, i) => `
-                <tr><td class="no-col">①②③④⑤⑥⑦⑧⑨⑩'[i + (data.fertilizers || []).length]</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td class="no-col">${(data.fertilizers || []).length + i + 1}</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                 `).join('')}
             </tbody>
         </table>
@@ -1332,7 +1332,7 @@
             <tbody>
                 ${(data.pesticides || []).slice(0, 8).map((p, i) => `
                 <tr>
-                    <td class="no-col">①②③④⑤⑥⑦⑧'[i]</td>
+                    <td class="no-col">${i + 1}</td>
                     <td>${p.date || ''}</td>
                     <td>${p.name || ''}</td>
                     <td>${p.ingredient || ''}</td>
@@ -1343,7 +1343,7 @@
                 </tr>
                 `).join('')}
                 ${Array.from({length: Math.max(0, 8 - (data.pesticides || []).length)}).map((_, i) => `
-                <tr><td class="no-col">①②③④⑤⑥⑦⑧'[i + (data.pesticides || []).length]</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr><td class="no-col">${(data.pesticides || []).length + i + 1}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
                 `).join('')}
             </tbody>
         </table>
