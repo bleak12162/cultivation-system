@@ -77,7 +77,15 @@
             <button class="tab active" onclick="switchTab(0)">📝 新規登録・編集</button>
             <button class="tab" onclick="switchTab(1)">📋 履歴一覧</button>
         </div>
-        
+        <div style="padding: 15px; background: #f0f7ff; border-bottom: 2px solid #2196f3; text-align: center;">
+            <button class="btn btn-primary" onclick="generateMultipleSampleRecords(5)" style="margin-right: 10px;">
+                🎲 サンプル栽培履歴を生成（5件）
+            </button>
+            <button class="btn btn-secondary" onclick="clearAllRecords()" style="">
+                🗑️ 全て削除
+            </button>
+        </div>
+
         <!-- タブ1: 入力フォーム -->
         <div class="tab-content active">
             <div class="section">
@@ -899,6 +907,156 @@
 
                 loadRecords();
                 showNotification('履歴を削除しました', 'success');
+            } catch (error) {
+                showNotification('エラー: ' + error.message, 'error');
+            }
+        }
+
+        // サンプルデータ生成
+        function generateSampleData(index) {
+            const farmers = ['山田太郎', '佐藤花子', '鈴木次郎', '佐々木美咲', '田中健介'];
+            const products = ['ミニトマト', 'キャベツ', 'ニンジン', 'ナス', 'キュウリ'];
+            const organizations = ['○○農園', '△△ファーム', '□□営農', '◇◇生産組合'];
+
+            const today = new Date();
+            const startDate = new Date(today);
+            startDate.setMonth(startDate.getMonth() - 3);
+
+            const farmerName = farmers[index % farmers.length];
+            const productName = products[index % products.length];
+            const org = organizations[index % organizations.length];
+
+            const varietyMap = {
+                'ミニトマト': 'アイコ',
+                'キャベツ': '寒玉',
+                'ニンジン': '標準品種',
+                'ナス': '長ナス',
+                'キュウリ': '青くん'
+            };
+
+            return {
+                id: Math.floor(Math.random() * 100000),
+                recorder_name: farmerName,
+                recorder_org: org,
+                recorder_address: `大阪府吹田市${farmerName}地区`,
+                recorder_tel: `06-${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`,
+                recorder_fax: `06-${Math.floor(Math.random() * 9000) + 1000}-${Math.floor(Math.random() * 9000) + 1000}`,
+
+                producer_name: farmers[(index + 1) % farmers.length],
+                producer_org: org,
+
+                product_name: productName,
+                product_spec: '秀品',
+                cultivation_variety: varietyMap[productName],
+                planting_area: Math.floor(Math.random() * 500) + 100,
+                plant_count: Math.floor(Math.random() * 5000) + 500,
+                expected_yield: Math.floor(Math.random() * 2000) + 500,
+                cultivation_type: '促成栽培',
+
+                seed_type: Math.random() > 0.5 ? '購入' : '自家採種',
+                seed_supplier: '○○種苗店',
+                seedling_method: '自家育苗',
+
+                fertilizers: [
+                    {
+                        date: startDate.toISOString().split('T')[0],
+                        name: '牛糞堆肥',
+                        material: '牛糞',
+                        maker: '農産物センター',
+                        amount: Math.floor(Math.random() * 500) + 200,
+                        notes: '基肥'
+                    },
+                    {
+                        date: new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        name: 'ニーム油かす',
+                        material: 'ニーム',
+                        maker: '有機肥料協会',
+                        amount: Math.floor(Math.random() * 300) + 100,
+                        notes: '追肥1回目'
+                    }
+                ],
+
+                pesticides: [
+                    {
+                        date: new Date(startDate.getTime() + 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        name: 'ニーム油',
+                        ingredient: 'ニーム精油',
+                        maker: '天然農薬メーカー',
+                        dilution: '500倍',
+                        target: 'アブラムシ、ハダニ'
+                    }
+                ],
+
+                works: [
+                    {
+                        type: 'seeding',
+                        content: '温床で育苗開始',
+                        startDate: startDate.toISOString().split('T')[0],
+                        endDate: new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        fertRef: '1',
+                        pestRef: '-',
+                        notes: '気温管理に注意'
+                    },
+                    {
+                        type: 'planting',
+                        content: '本圃へ定植',
+                        startDate: new Date(startDate.getTime() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        endDate: new Date(startDate.getTime() + 35 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        fertRef: '2',
+                        pestRef: '-',
+                        notes: '雨の日を避けて定植'
+                    },
+                    {
+                        type: 'harvest',
+                        content: '初回収穫',
+                        startDate: new Date(startDate.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        endDate: today.toISOString().split('T')[0],
+                        fertRef: '-',
+                        pestRef: '-',
+                        notes: '毎日早朝に収穫'
+                    }
+                ],
+
+                prev_crop_name: 'キャベツ',
+                cultivation_class: 'special',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+        }
+
+        // 複数のサンプル記録を生成
+        function generateMultipleSampleRecords(count) {
+            if (!confirm(`${count}個のサンプル栽培履歴を生成しますか?`)) return;
+
+            try {
+                const records = JSON.parse(localStorage.getItem('cultivationRecords') || '[]');
+
+                for (let i = 0; i < count; i++) {
+                    records.push(generateSampleData(i));
+                }
+
+                localStorage.setItem('cultivationRecords', JSON.stringify(records));
+                showNotification(`✅ ${count}個のサンプルデータを生成しました`, 'success');
+
+                // 履歴一覧タブに切り替え
+                setTimeout(() => {
+                    switchTab(1);
+                    loadRecords();
+                }, 500);
+            } catch (error) {
+                showNotification('エラー: ' + error.message, 'error');
+            }
+        }
+
+        // 全て削除
+        function clearAllRecords() {
+            if (!confirm('全ての記録を削除しますか? この操作は取り消せません')) return;
+
+            try {
+                localStorage.removeItem('cultivationRecords');
+                currentRecordId = null;
+                showNotification('全ての記録を削除しました', 'success');
+                loadRecords();
             } catch (error) {
                 showNotification('エラー: ' + error.message, 'error');
             }
