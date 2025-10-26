@@ -201,45 +201,124 @@
 
             <div class="section">
                 <div class="section-title">種子・育苗情報</div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>種子</label>
-                        <select id="seed_type">
-                            <option value="">選択してください</option>
-                            <option value="purchase">購入</option>
-                            <option value="self">自家採種</option>
-                        </select>
+
+                <!-- 種子情報 -->
+                <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #ddd;">
+                    <h4 style="color: #5f72bd; margin-bottom: 15px; font-size: 15px; font-weight: 600;">🌱 種子情報</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>種子<span class="required">*</span></label>
+                            <select id="seed_type">
+                                <option value="">選択してください</option>
+                                <option value="purchase">購入</option>
+                                <option value="self">自家採種</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>種子購入先</label>
+                            <input type="text" id="seed_supplier" placeholder="例:○○種苗店">
+                        </div>
+                        <div class="form-group">
+                            <label>種子消毒</label>
+                            <select id="seed_sterilization">
+                                <option value="">選択してください</option>
+                                <option value="none">なし</option>
+                                <option value="heating">加熱</option>
+                                <option value="chemical">薬剤</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>消毒薬剤名</label>
+                            <input type="text" id="seed_sterilization_chemical" placeholder="例:カスケード">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>種子購入先</label>
-                        <input type="text" id="seed_supplier" placeholder="例:○○種苗店">
+                </div>
+
+                <!-- 育苗情報 -->
+                <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #ddd;">
+                    <h4 style="color: #5f72bd; margin-bottom: 15px; font-size: 15px; font-weight: 600;">🌿 育苗情報</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>育苗方法<span class="required">*</span></label>
+                            <select id="seedling_method">
+                                <option value="">選択してください</option>
+                                <option value="self">自家育苗</option>
+                                <option value="purchase">購入</option>
+                                <option value="other">その他</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>育苗購入先</label>
+                            <input type="text" id="seedling_purchase_place" placeholder="購入先名">
+                        </div>
+                        <div class="form-group">
+                            <label>育苗中防除</label>
+                            <select id="seedling_disease_control">
+                                <option value="">選択してください</option>
+                                <option value="yes">あり</option>
+                                <option value="no">なし</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>防除薬剤名</label>
+                            <input type="text" id="seedling_disease_control_chemical" placeholder="例:ミネクトデュオ">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>育苗方法</label>
-                        <select id="seedling_method">
-                            <option value="">選択してください</option>
-                            <option value="self">自家育苗</option>
-                            <option value="purchase">購入</option>
-                            <option value="other">その他</option>
-                        </select>
+                </div>
+
+                <!-- 床土情報 -->
+                <div>
+                    <h4 style="color: #5f72bd; margin-bottom: 15px; font-size: 15px; font-weight: 600;">🪱 床土情報（育苗時）</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>床土</label>
+                            <select id="bed_soil_type">
+                                <option value="">選択してください</option>
+                                <option value="self">自作</option>
+                                <option value="purchase">購入</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label>床土原料</label>
+                            <input type="text" id="bed_soil_material" placeholder="例:ピートモス、パーライト等">
+                        </div>
+                        <div class="form-group">
+                            <label>購入先</label>
+                            <input type="text" id="bed_soil_purchase_place" placeholder="購入先名">
+                        </div>
+                        <div class="form-group">
+                            <label>床土消毒</label>
+                            <select id="bed_soil_sterilization">
+                                <option value="">選択してください</option>
+                                <option value="none">なし</option>
+                                <option value="heating">加熱</option>
+                                <option value="chemical">薬剤</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>消毒薬剤名</label>
+                            <input type="text" id="bed_soil_sterilization_chemical" placeholder="例:フロンサイド等">
+                        </div>
                     </div>
                 </div>
             </div>
             
             <div class="section">
-                <div class="section-title">肥料使用履歴</div>
-                <div class="table-section">
+                <div class="section-title">肥料及び土壌改良資材（堆肥・液肥・化学肥料等）</div>
+                <div class="table-section" style="overflow-x: auto;">
                     <table id="fertilizer-table">
                         <thead>
                             <tr>
-                                <th style="width: 40px;">No.</th>
-                                <th style="width: 100px;">施用日</th>
-                                <th style="width: 150px;">使用資材名称</th>
-                                <th style="width: 150px;">原料</th>
-                                <th style="width: 120px;">製造メーカー</th>
-                                <th style="width: 100px;">施用量(kg/10a)</th>
-                                <th style="width: 150px;">備考</th>
-                                <th style="width: 60px;">削除</th>
+                                <th style="width: 30px;">No.</th>
+                                <th style="width: 90px;">施用日</th>
+                                <th style="width: 120px;">使用資材名称</th>
+                                <th style="width: 100px;">原料</th>
+                                <th style="width: 100px;">製造メーカー</th>
+                                <th style="width: 90px;">施用量(kg/10a)</th>
+                                <th style="width: 80px;">化学肥料</th>
+                                <th style="width: 90px;">化成N施用量(kg)</th>
+                                <th style="width: 100px;">備考</th>
+                                <th style="width: 50px;">削除</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -250,6 +329,8 @@
                                 <td><input type="text" class="fert-material" placeholder="牛糞"></td>
                                 <td><input type="text" class="fert-maker"></td>
                                 <td><input type="number" class="fert-amount" step="0.1"></td>
+                                <td><select class="fert-chemical-flag"><option value="">選択</option><option value="yes">有</option><option value="no">無</option></select></td>
+                                <td><input type="number" class="fert-n-amount" step="0.1" placeholder="kg"></td>
                                 <td><input type="text" class="fert-notes"></td>
                                 <td><button class="btn-remove" onclick="removeRow(this)">削除</button></td>
                             </tr>
@@ -257,22 +338,31 @@
                     </table>
                     <button class="btn-add-row" onclick="addFertilizerRow()">+ 行を追加</button>
                 </div>
+                <div class="form-grid" style="margin-top: 20px;">
+                    <div class="form-group">
+                        <label>窒素成分削減率 (%)</label>
+                        <input type="number" id="nitrogen_reduction_rate" step="0.1" placeholder="0">
+                    </div>
+                </div>
             </div>
 
             <div class="section">
-                <div class="section-title">農薬使用履歴</div>
-                <div class="table-section">
+                <div class="section-title">病害虫防除・除草・成長調整資材</div>
+                <div class="table-section" style="overflow-x: auto;">
                     <table id="pesticide-table">
                         <thead>
                             <tr>
-                                <th style="width: 40px;">No.</th>
-                                <th style="width: 100px;">使用日</th>
-                                <th style="width: 150px;">使用農薬資材名称</th>
-                                <th style="width: 150px;">成分名</th>
-                                <th style="width: 120px;">製造メーカー</th>
-                                <th style="width: 100px;">希釈率・使用量</th>
-                                <th style="width: 100px;">対象病害虫</th>
-                                <th style="width: 60px;">削除</th>
+                                <th style="width: 30px;">No.</th>
+                                <th style="width: 80px;">使用日</th>
+                                <th style="width: 110px;">農薬資材名称</th>
+                                <th style="width: 100px;">成分名/原料</th>
+                                <th style="width: 90px;">製造メーカー</th>
+                                <th style="width: 80px;">希釈率</th>
+                                <th style="width: 90px;">対象病害虫</th>
+                                <th style="width: 80px;">散布～収穫日数</th>
+                                <th style="width: 80px;">農薬回数</th>
+                                <th style="width: 70px;">資材区分</th>
+                                <th style="width: 50px;">削除</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -280,15 +370,24 @@
                                 <td>1</td>
                                 <td><input type="date" class="pest-date"></td>
                                 <td><input type="text" class="pest-name" placeholder="例:ニーム油"></td>
-                                <td><input type="text" class="pest-ingredient"></td>
+                                <td><input type="text" class="pest-ingredient" placeholder="例:ニーム精油"></td>
                                 <td><input type="text" class="pest-maker"></td>
                                 <td><input type="text" class="pest-dilution" placeholder="例:500倍"></td>
                                 <td><input type="text" class="pest-target" placeholder="例:アブラムシ"></td>
+                                <td><input type="number" class="pest-days-to-harvest" placeholder="日数" step="1"></td>
+                                <td><input type="number" class="pest-count" placeholder="回" step="1"></td>
+                                <td><select class="pest-material-type"><option value="">選択</option><option value="chemical">農薬</option><option value="natural">天然</option></select></td>
                                 <td><button class="btn-remove" onclick="removeRow(this)">削除</button></td>
                             </tr>
                         </tbody>
                     </table>
                     <button class="btn-add-row" onclick="addPesticideRow()">+ 行を追加</button>
+                </div>
+                <div class="form-grid" style="margin-top: 20px;">
+                    <div class="form-group">
+                        <label>農薬成分削減率 (%)</label>
+                        <input type="number" id="pesticide_reduction_rate" step="0.1" placeholder="0">
+                    </div>
                 </div>
             </div>
 
@@ -431,7 +530,172 @@
                     </div>
                 </div>
             </div>
-            
+
+            <!-- 月別スケジュール表 (Phase 4) -->
+            <div class="section">
+                <div class="section-title">📆 月別スケジュール表</div>
+                <p style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                    各月の栽培作業を入力します。年間を通じた作業計画を一目で把握できます。
+                </p>
+                <div style="overflow-x: auto; margin-bottom: 20px;">
+                    <table id="monthly-schedule-table" style="width: 100%; font-size: 12px;">
+                        <thead>
+                            <tr>
+                                <th style="width: 80px;">項目</th>
+                                <th>1月</th><th>2月</th><th>3月</th><th>4月</th><th>5月</th><th>6月</th>
+                                <th>7月</th><th>8月</th><th>9月</th><th>10月</th><th>11月</th><th>12月</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="font-weight: 600; background: #f0f0f0;">作業内容</td>
+                                <td><input type="text" class="monthly-work-jan" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-feb" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-mar" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-apr" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-may" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-jun" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-jul" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-aug" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-sep" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-oct" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-nov" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-work-dec" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600; background: #f0f0f0;">肥料(No.)</td>
+                                <td><input type="text" class="monthly-fert-jan" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-feb" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-mar" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-apr" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-may" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-jun" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-jul" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-aug" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-sep" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-oct" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-nov" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-fert-dec" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600; background: #f0f0f0;">防除(No.)</td>
+                                <td><input type="text" class="monthly-pest-jan" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-feb" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-mar" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-apr" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-may" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-jun" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-jul" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-aug" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-sep" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-oct" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-nov" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-pest-dec" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 600; background: #f0f0f0;">その他特記</td>
+                                <td><input type="text" class="monthly-note-jan" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-feb" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-mar" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-apr" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-may" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-jun" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-jul" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-aug" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-sep" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-oct" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-nov" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                                <td><input type="text" class="monthly-note-dec" style="width: 100%; padding: 6px; font-size: 11px;"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 進捗管理・有機認証情報 (Phase 5) -->
+            <div class="section">
+                <div class="section-title">🏆 進捗管理・基準情報</div>
+
+                <!-- 前作物管理情報 -->
+                <div style="margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid #ddd;">
+                    <h4 style="color: #5f72bd; margin-bottom: 15px; font-size: 15px; font-weight: 600;">📋 前作物管理情報</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>前作物での化学肥料使用</label>
+                            <select id="prev_crop_chemical_fertilizer">
+                                <option value="">選択してください</option>
+                                <option value="yes">有</option>
+                                <option value="no">無</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>前作物での土壌消毒</label>
+                            <select id="prev_crop_soil_sterilization">
+                                <option value="">選択してください</option>
+                                <option value="yes">実施</option>
+                                <option value="no">未実施</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>前作物での除草剤使用</label>
+                            <select id="prev_crop_herbicide">
+                                <option value="">選択してください</option>
+                                <option value="yes">有</option>
+                                <option value="no">無</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>優先農薬使用</label>
+                            <select id="priority_pesticide">
+                                <option value="">選択してください</option>
+                                <option value="yes">有</option>
+                                <option value="no">無</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 栽培認証・基準情報 -->
+                <div>
+                    <h4 style="color: #5f72bd; margin-bottom: 15px; font-size: 15px; font-weight: 600;">✅ 栽培認証・基準情報</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>有機JAS認証</label>
+                            <select id="organic_jas_certification">
+                                <option value="">選択してください</option>
+                                <option value="certified">認証取得</option>
+                                <option value="in_process">取得中</option>
+                                <option value="not_certified">未申請</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>特別栽培農産物認定</label>
+                            <select id="special_cultivation_certified">
+                                <option value="">選択してください</option>
+                                <option value="yes">認定</option>
+                                <option value="no">非認定</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>エコファーマー認定</label>
+                            <select id="eco_farmer_certified">
+                                <option value="">選択してください</option>
+                                <option value="yes">認定</option>
+                                <option value="no">非認定</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>環境配慮加算適用</label>
+                            <select id="environment_incentive">
+                                <option value="">選択してください</option>
+                                <option value="yes">適用</option>
+                                <option value="no">非適用</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="action-buttons">
                 <button class="btn btn-success" onclick="saveRecord()">💾 保存</button>
                 <button class="btn btn-primary" onclick="generatePDF()">📄 PDF生成</button>
@@ -538,10 +802,12 @@
                 <tr>
                     <td>${rowCount}</td>
                     <td><input type="date" class="fert-date"></td>
-                    <td><input type="text" class="fert-name"></td>
-                    <td><input type="text" class="fert-material"></td>
+                    <td><input type="text" class="fert-name" placeholder="例:牛糞堆肥"></td>
+                    <td><input type="text" class="fert-material" placeholder="牛糞"></td>
                     <td><input type="text" class="fert-maker"></td>
                     <td><input type="number" class="fert-amount" step="0.1"></td>
+                    <td><select class="fert-chemical-flag"><option value="">選択</option><option value="yes">有</option><option value="no">無</option></select></td>
+                    <td><input type="number" class="fert-n-amount" step="0.1" placeholder="kg"></td>
                     <td><input type="text" class="fert-notes"></td>
                     <td><button class="btn-remove" onclick="removeRow(this)">削除</button></td>
                 </tr>
@@ -557,11 +823,14 @@
                 <tr>
                     <td>${rowCount}</td>
                     <td><input type="date" class="pest-date"></td>
-                    <td><input type="text" class="pest-name"></td>
-                    <td><input type="text" class="pest-ingredient"></td>
+                    <td><input type="text" class="pest-name" placeholder="例:ニーム油"></td>
+                    <td><input type="text" class="pest-ingredient" placeholder="例:ニーム精油"></td>
                     <td><input type="text" class="pest-maker"></td>
-                    <td><input type="text" class="pest-dilution"></td>
-                    <td><input type="text" class="pest-target"></td>
+                    <td><input type="text" class="pest-dilution" placeholder="例:500倍"></td>
+                    <td><input type="text" class="pest-target" placeholder="例:アブラムシ"></td>
+                    <td><input type="number" class="pest-days-to-harvest" placeholder="日数" step="1"></td>
+                    <td><input type="number" class="pest-count" placeholder="回" step="1"></td>
+                    <td><select class="pest-material-type"><option value="">選択</option><option value="chemical">農薬</option><option value="natural">天然</option></select></td>
                     <td><button class="btn-remove" onclick="removeRow(this)">削除</button></td>
                 </tr>
             `;
@@ -737,6 +1006,22 @@
 
         // データ収集
         function collectFormData() {
+            // 複数品種テーブルから品種データを収集
+            const varieties = [];
+            document.querySelectorAll('#varieties-tbody tr').forEach((row, index) => {
+                const name = row.querySelector('.variety-name')?.value;
+                const area = row.querySelector('.planting-area')?.value;
+                if (name || area) {
+                    varieties.push({
+                        name: name,
+                        plantingArea: area,
+                        plantCount10a: row.querySelector('.plant-count-10a')?.value,
+                        expectedYield10a: row.querySelector('.expected-yield-10a')?.value,
+                        expectedYieldTotal: row.querySelector('.expected-yield-total')?.value
+                    });
+                }
+            });
+
             const fertilizers = [];
             document.querySelectorAll('#fertilizer-table tbody tr').forEach((row, index) => {
                 const date = row.querySelector('.fert-date')?.value;
@@ -748,6 +1033,8 @@
                         material: row.querySelector('.fert-material')?.value,
                         maker: row.querySelector('.fert-maker')?.value,
                         amount: row.querySelector('.fert-amount')?.value,
+                        chemicalFlag: row.querySelector('.fert-chemical-flag')?.value,
+                        chemicalNAmount: row.querySelector('.fert-n-amount')?.value,
                         notes: row.querySelector('.fert-notes')?.value
                     });
                 }
@@ -764,7 +1051,10 @@
                         ingredient: row.querySelector('.pest-ingredient')?.value,
                         maker: row.querySelector('.pest-maker')?.value,
                         dilution: row.querySelector('.pest-dilution')?.value,
-                        target: row.querySelector('.pest-target')?.value
+                        target: row.querySelector('.pest-target')?.value,
+                        daysToHarvest: row.querySelector('.pest-days-to-harvest')?.value,
+                        pestCount: row.querySelector('.pest-count')?.value,
+                        materialType: row.querySelector('.pest-material-type')?.value
                     });
                 }
             });
@@ -789,6 +1079,7 @@
             return {
                 id: currentRecordId || Date.now(),
                 timestamp: new Date().toISOString(),
+                record_date: document.getElementById('record_date').value,
                 recorder_name: document.getElementById('recorder_name').value,
                 recorder_org: document.getElementById('recorder_org').value,
                 recorder_address: document.getElementById('recorder_address').value,
@@ -798,19 +1089,100 @@
                 producer_org: document.getElementById('producer_org').value,
                 product_name: document.getElementById('product_name').value,
                 product_spec: document.getElementById('product_spec').value,
-                cultivation_variety: document.getElementById('cultivation_variety').value,
-                planting_area: document.getElementById('planting_area').value,
-                plant_count: document.getElementById('plant_count').value,
-                expected_yield: document.getElementById('expected_yield').value,
                 cultivation_type: document.getElementById('cultivation_type').value,
+                varieties: varieties,
+                total_planting_area: document.getElementById('total-planting-area').value,
+                total_expected_yield: document.getElementById('total-expected-yield').value,
                 seed_type: document.getElementById('seed_type').value,
                 seed_supplier: document.getElementById('seed_supplier').value,
+                seed_sterilization: document.getElementById('seed_sterilization').value,
+                seed_sterilization_chemical: document.getElementById('seed_sterilization_chemical').value,
                 seedling_method: document.getElementById('seedling_method').value,
+                seedling_purchase_place: document.getElementById('seedling_purchase_place').value,
+                seedling_disease_control: document.getElementById('seedling_disease_control').value,
+                seedling_disease_control_chemical: document.getElementById('seedling_disease_control_chemical').value,
+                bed_soil_type: document.getElementById('bed_soil_type').value,
+                bed_soil_material: document.getElementById('bed_soil_material').value,
+                bed_soil_purchase_place: document.getElementById('bed_soil_purchase_place').value,
+                bed_soil_sterilization: document.getElementById('bed_soil_sterilization').value,
+                bed_soil_sterilization_chemical: document.getElementById('bed_soil_sterilization_chemical').value,
+                nitrogen_reduction_rate: document.getElementById('nitrogen_reduction_rate').value,
+                pesticide_reduction_rate: document.getElementById('pesticide_reduction_rate').value,
                 prev_crop_name: document.getElementById('prev_crop_name').value,
                 cultivation_class: document.getElementById('cultivation_class').value,
                 fertilizers: fertilizers,
                 pesticides: pesticides,
-                works: works
+                works: works,
+
+                // Phase 4: 月別スケジュール表
+                monthlySchedule: {
+                    work: {
+                        jan: document.querySelector('.monthly-work-jan')?.value,
+                        feb: document.querySelector('.monthly-work-feb')?.value,
+                        mar: document.querySelector('.monthly-work-mar')?.value,
+                        apr: document.querySelector('.monthly-work-apr')?.value,
+                        may: document.querySelector('.monthly-work-may')?.value,
+                        jun: document.querySelector('.monthly-work-jun')?.value,
+                        jul: document.querySelector('.monthly-work-jul')?.value,
+                        aug: document.querySelector('.monthly-work-aug')?.value,
+                        sep: document.querySelector('.monthly-work-sep')?.value,
+                        oct: document.querySelector('.monthly-work-oct')?.value,
+                        nov: document.querySelector('.monthly-work-nov')?.value,
+                        dec: document.querySelector('.monthly-work-dec')?.value
+                    },
+                    fertilizer: {
+                        jan: document.querySelector('.monthly-fert-jan')?.value,
+                        feb: document.querySelector('.monthly-fert-feb')?.value,
+                        mar: document.querySelector('.monthly-fert-mar')?.value,
+                        apr: document.querySelector('.monthly-fert-apr')?.value,
+                        may: document.querySelector('.monthly-fert-may')?.value,
+                        jun: document.querySelector('.monthly-fert-jun')?.value,
+                        jul: document.querySelector('.monthly-fert-jul')?.value,
+                        aug: document.querySelector('.monthly-fert-aug')?.value,
+                        sep: document.querySelector('.monthly-fert-sep')?.value,
+                        oct: document.querySelector('.monthly-fert-oct')?.value,
+                        nov: document.querySelector('.monthly-fert-nov')?.value,
+                        dec: document.querySelector('.monthly-fert-dec')?.value
+                    },
+                    pesticide: {
+                        jan: document.querySelector('.monthly-pest-jan')?.value,
+                        feb: document.querySelector('.monthly-pest-feb')?.value,
+                        mar: document.querySelector('.monthly-pest-mar')?.value,
+                        apr: document.querySelector('.monthly-pest-apr')?.value,
+                        may: document.querySelector('.monthly-pest-may')?.value,
+                        jun: document.querySelector('.monthly-pest-jun')?.value,
+                        jul: document.querySelector('.monthly-pest-jul')?.value,
+                        aug: document.querySelector('.monthly-pest-aug')?.value,
+                        sep: document.querySelector('.monthly-pest-sep')?.value,
+                        oct: document.querySelector('.monthly-pest-oct')?.value,
+                        nov: document.querySelector('.monthly-pest-nov')?.value,
+                        dec: document.querySelector('.monthly-pest-dec')?.value
+                    },
+                    notes: {
+                        jan: document.querySelector('.monthly-note-jan')?.value,
+                        feb: document.querySelector('.monthly-note-feb')?.value,
+                        mar: document.querySelector('.monthly-note-mar')?.value,
+                        apr: document.querySelector('.monthly-note-apr')?.value,
+                        may: document.querySelector('.monthly-note-may')?.value,
+                        jun: document.querySelector('.monthly-note-jun')?.value,
+                        jul: document.querySelector('.monthly-note-jul')?.value,
+                        aug: document.querySelector('.monthly-note-aug')?.value,
+                        sep: document.querySelector('.monthly-note-sep')?.value,
+                        oct: document.querySelector('.monthly-note-oct')?.value,
+                        nov: document.querySelector('.monthly-note-nov')?.value,
+                        dec: document.querySelector('.monthly-note-dec')?.value
+                    }
+                },
+
+                // Phase 5: 進捗管理・基準情報
+                prev_crop_chemical_fertilizer: document.getElementById('prev_crop_chemical_fertilizer').value,
+                prev_crop_soil_sterilization: document.getElementById('prev_crop_soil_sterilization').value,
+                prev_crop_herbicide: document.getElementById('prev_crop_herbicide').value,
+                priority_pesticide: document.getElementById('priority_pesticide').value,
+                organic_jas_certification: document.getElementById('organic_jas_certification').value,
+                special_cultivation_certified: document.getElementById('special_cultivation_certified').value,
+                eco_farmer_certified: document.getElementById('eco_farmer_certified').value,
+                environment_incentive: document.getElementById('environment_incentive').value
             };
         }
 
@@ -900,7 +1272,9 @@
                 }
 
                 currentRecordId = id;
-                
+
+                // 基本情報
+                document.getElementById('record_date').value = record.record_date || '';
                 document.getElementById('recorder_name').value = record.recorder_name || '';
                 document.getElementById('recorder_org').value = record.recorder_org || '';
                 document.getElementById('recorder_address').value = record.recorder_address || '';
@@ -910,16 +1284,38 @@
                 document.getElementById('producer_org').value = record.producer_org || '';
                 document.getElementById('product_name').value = record.product_name || '';
                 document.getElementById('product_spec').value = record.product_spec || '';
-                document.getElementById('cultivation_variety').value = record.cultivation_variety || '';
-                document.getElementById('planting_area').value = record.planting_area || '';
-                document.getElementById('plant_count').value = record.plant_count || '';
-                document.getElementById('expected_yield').value = record.expected_yield || '';
                 document.getElementById('cultivation_type').value = record.cultivation_type || '';
-                document.getElementById('seed_type').value = record.seed_type || '';
-                document.getElementById('seed_supplier').value = record.seed_supplier || '';
-                document.getElementById('seedling_method').value = record.seedling_method || '';
                 document.getElementById('prev_crop_name').value = record.prev_crop_name || '';
                 document.getElementById('cultivation_class').value = record.cultivation_class || '';
+
+                // 複数品種テーブル
+                const varietiesTable = document.querySelector('#varieties-tbody');
+                varietiesTable.innerHTML = '';
+                (record.varieties || []).forEach((variety, i) => {
+                    addVarietyRow();
+                    const row = varietiesTable.rows[i];
+                    row.querySelector('.variety-name').value = variety.name || '';
+                    row.querySelector('.planting-area').value = variety.plantingArea || '';
+                    row.querySelector('.plant-count-10a').value = variety.plantCount10a || '';
+                    row.querySelector('.expected-yield-10a').value = variety.expectedYield10a || '';
+                });
+                if (varietiesTable.rows.length === 0) addVarietyRow();
+                updateTotals();
+
+                // 種子・育苗情報
+                document.getElementById('seed_type').value = record.seed_type || '';
+                document.getElementById('seed_supplier').value = record.seed_supplier || '';
+                document.getElementById('seed_sterilization').value = record.seed_sterilization || '';
+                document.getElementById('seed_sterilization_chemical').value = record.seed_sterilization_chemical || '';
+                document.getElementById('seedling_method').value = record.seedling_method || '';
+                document.getElementById('seedling_purchase_place').value = record.seedling_purchase_place || '';
+                document.getElementById('seedling_disease_control').value = record.seedling_disease_control || '';
+                document.getElementById('seedling_disease_control_chemical').value = record.seedling_disease_control_chemical || '';
+                document.getElementById('bed_soil_type').value = record.bed_soil_type || '';
+                document.getElementById('bed_soil_material').value = record.bed_soil_material || '';
+                document.getElementById('bed_soil_purchase_place').value = record.bed_soil_purchase_place || '';
+                document.getElementById('bed_soil_sterilization').value = record.bed_soil_sterilization || '';
+                document.getElementById('bed_soil_sterilization_chemical').value = record.bed_soil_sterilization_chemical || '';
 
                 // 肥料テーブル
                 const fertTable = document.querySelector('#fertilizer-table tbody');
@@ -932,9 +1328,12 @@
                     row.querySelector('.fert-material').value = fert.material || '';
                     row.querySelector('.fert-maker').value = fert.maker || '';
                     row.querySelector('.fert-amount').value = fert.amount || '';
+                    row.querySelector('.fert-chemical-flag').value = fert.chemicalFlag || '';
+                    row.querySelector('.fert-n-amount').value = fert.chemicalNAmount || '';
                     row.querySelector('.fert-notes').value = fert.notes || '';
                 });
                 if (fertTable.rows.length === 0) addFertilizerRow();
+                document.getElementById('nitrogen_reduction_rate').value = record.nitrogen_reduction_rate || '';
 
                 // 農薬テーブル
                 const pestTable = document.querySelector('#pesticide-table tbody');
@@ -948,8 +1347,12 @@
                     row.querySelector('.pest-maker').value = pest.maker || '';
                     row.querySelector('.pest-dilution').value = pest.dilution || '';
                     row.querySelector('.pest-target').value = pest.target || '';
+                    row.querySelector('.pest-days-to-harvest').value = pest.daysToHarvest || '';
+                    row.querySelector('.pest-count').value = pest.pestCount || '';
+                    row.querySelector('.pest-material-type').value = pest.materialType || '';
                 });
                 if (pestTable.rows.length === 0) addPesticideRow();
+                document.getElementById('pesticide_reduction_rate').value = record.pesticide_reduction_rate || '';
 
                 // 作業記録テーブル
                 const workTable = document.querySelector('#work-table tbody');
@@ -966,7 +1369,35 @@
                     row.querySelector('.work-notes').value = work.notes || '';
                 });
                 if (workTable.rows.length === 0) addWorkRow();
-                
+
+                // Phase 4: 月別スケジュール表を読み込み
+                const monthlySchedule = record.monthlySchedule || {};
+                const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+                months.forEach(month => {
+                    // 作業
+                    const workEl = document.querySelector(`.monthly-work-${month}`);
+                    if (workEl) workEl.value = (monthlySchedule.work?.[month] || '');
+                    // 肥料
+                    const fertEl = document.querySelector(`.monthly-fert-${month}`);
+                    if (fertEl) fertEl.value = (monthlySchedule.fertilizer?.[month] || '');
+                    // 防除
+                    const pestEl = document.querySelector(`.monthly-pest-${month}`);
+                    if (pestEl) pestEl.value = (monthlySchedule.pesticide?.[month] || '');
+                    // その他
+                    const noteEl = document.querySelector(`.monthly-note-${month}`);
+                    if (noteEl) noteEl.value = (monthlySchedule.notes?.[month] || '');
+                });
+
+                // Phase 5: 進捗管理・基準情報を読み込み
+                document.getElementById('prev_crop_chemical_fertilizer').value = record.prev_crop_chemical_fertilizer || '';
+                document.getElementById('prev_crop_soil_sterilization').value = record.prev_crop_soil_sterilization || '';
+                document.getElementById('prev_crop_herbicide').value = record.prev_crop_herbicide || '';
+                document.getElementById('priority_pesticide').value = record.priority_pesticide || '';
+                document.getElementById('organic_jas_certification').value = record.organic_jas_certification || '';
+                document.getElementById('special_cultivation_certified').value = record.special_cultivation_certified || '';
+                document.getElementById('eco_farmer_certified').value = record.eco_farmer_certified || '';
+                document.getElementById('environment_incentive').value = record.environment_incentive || '';
+
                 // タイムラインを更新
                 updateWorkTimeline();
 
@@ -1004,7 +1435,10 @@
             const organizations = ['○○農園', '△△ファーム', '□□営農', '◇◇生産組合'];
 
             const today = new Date();
-            const startDate = new Date(today);
+            const recordDate = new Date(today);
+            recordDate.setDate(recordDate.getDate() - Math.floor(Math.random() * 30));
+
+            const startDate = new Date(recordDate);
             startDate.setMonth(startDate.getMonth() - 3);
 
             const farmerName = farmers[index % farmers.length];
@@ -1019,8 +1453,16 @@
                 'キュウリ': '青くん'
             };
 
+            const planting_area = Math.floor(Math.random() * 500) + 100;
+            const plant_count_10a = Math.floor(Math.random() * 5000) + 500;
+            const expected_yield_10a = Math.floor(Math.random() * 2000) + 500;
+            const expected_yield_total = (planting_area * expected_yield_10a / 10).toFixed(1);
+
             return {
                 id: Math.floor(Math.random() * 100000),
+                record_date: recordDate.toISOString().split('T')[0],
+                timestamp: new Date().toISOString(),
+
                 recorder_name: farmerName,
                 recorder_org: org,
                 recorder_address: `大阪府吹田市${farmerName}地区`,
@@ -1032,15 +1474,38 @@
 
                 product_name: productName,
                 product_spec: '秀品',
-                cultivation_variety: varietyMap[productName],
-                planting_area: Math.floor(Math.random() * 500) + 100,
-                plant_count: Math.floor(Math.random() * 5000) + 500,
-                expected_yield: Math.floor(Math.random() * 2000) + 500,
                 cultivation_type: '促成栽培',
 
-                seed_type: Math.random() > 0.5 ? '購入' : '自家採種',
+                // 複数品種データ
+                varieties: [
+                    {
+                        name: varietyMap[productName],
+                        plantingArea: planting_area,
+                        plantCount10a: plant_count_10a,
+                        expectedYield10a: expected_yield_10a,
+                        expectedYieldTotal: expected_yield_total
+                    }
+                ],
+                total_planting_area: planting_area.toString(),
+                total_expected_yield: expected_yield_total,
+
+                // 種子・育苗情報
+                seed_type: Math.random() > 0.5 ? 'purchase' : 'self',
                 seed_supplier: '○○種苗店',
-                seedling_method: '自家育苗',
+                seed_sterilization: Math.random() > 0.5 ? 'heating' : 'chemical',
+                seed_sterilization_chemical: Math.random() > 0.5 ? 'カスケード' : '',
+                seedling_method: 'self',
+                seedling_purchase_place: '',
+                seedling_disease_control: Math.random() > 0.5 ? 'yes' : 'no',
+                seedling_disease_control_chemical: 'ミネクトデュオ',
+                bed_soil_type: Math.random() > 0.5 ? 'self' : 'purchase',
+                bed_soil_material: 'ピートモス、パーライト',
+                bed_soil_purchase_place: Math.random() > 0.5 ? '○○種苗店' : '',
+                bed_soil_sterilization: 'heating',
+                bed_soil_sterilization_chemical: '',
+
+                nitrogen_reduction_rate: (Math.floor(Math.random() * 30) + 10).toString(),
+                pesticide_reduction_rate: (Math.floor(Math.random() * 40) + 20).toString(),
 
                 fertilizers: [
                     {
@@ -1048,7 +1513,9 @@
                         name: '牛糞堆肥',
                         material: '牛糞',
                         maker: '農産物センター',
-                        amount: Math.floor(Math.random() * 500) + 200,
+                        amount: (Math.floor(Math.random() * 500) + 200).toString(),
+                        chemicalFlag: 'no',
+                        chemicalNAmount: '',
                         notes: '基肥'
                     },
                     {
@@ -1056,8 +1523,20 @@
                         name: 'ニーム油かす',
                         material: 'ニーム',
                         maker: '有機肥料協会',
-                        amount: Math.floor(Math.random() * 300) + 100,
+                        amount: (Math.floor(Math.random() * 300) + 100).toString(),
+                        chemicalFlag: 'no',
+                        chemicalNAmount: '',
                         notes: '追肥1回目'
+                    },
+                    {
+                        date: new Date(startDate.getTime() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        name: '鶏糞肥料',
+                        material: '鶏糞',
+                        maker: '自然派肥料',
+                        amount: (Math.floor(Math.random() * 200) + 50).toString(),
+                        chemicalFlag: 'no',
+                        chemicalNAmount: '',
+                        notes: '追肥2回目'
                     }
                 ],
 
@@ -1068,7 +1547,21 @@
                         ingredient: 'ニーム精油',
                         maker: '天然農薬メーカー',
                         dilution: '500倍',
-                        target: 'アブラムシ、ハダニ'
+                        target: 'アブラムシ、ハダニ',
+                        daysToHarvest: (Math.floor(Math.random() * 30) + 5).toString(),
+                        pestCount: '1',
+                        materialType: 'natural'
+                    },
+                    {
+                        date: new Date(startDate.getTime() + 75 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        name: '木酢液',
+                        ingredient: '木酢液',
+                        maker: '自然派',
+                        dilution: '100倍',
+                        target: 'うどんこ病予防',
+                        daysToHarvest: '0',
+                        pestCount: '1',
+                        materialType: 'natural'
                     }
                 ],
 
@@ -1092,6 +1585,24 @@
                         notes: '雨の日を避けて定植'
                     },
                     {
+                        type: 'fertilizer',
+                        content: '追肥施用',
+                        startDate: new Date(startDate.getTime() + 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        endDate: new Date(startDate.getTime() + 45 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        fertRef: '2',
+                        pestRef: '-',
+                        notes: '開花期前の施肥'
+                    },
+                    {
+                        type: 'pest-control',
+                        content: '病害虫防除',
+                        startDate: new Date(startDate.getTime() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        endDate: new Date(startDate.getTime() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+                        fertRef: '-',
+                        pestRef: '1',
+                        notes: 'アブラムシ防除'
+                    },
+                    {
                         type: 'harvest',
                         content: '初回収穫',
                         startDate: new Date(startDate.getTime() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -1104,6 +1615,47 @@
 
                 prev_crop_name: 'キャベツ',
                 cultivation_class: 'special',
+
+                // Phase 4: 月別スケジュール表データ
+                monthlySchedule: {
+                    work: {
+                        jan: '準備・土づくり',
+                        feb: '播種・育苗',
+                        mar: '定植準備',
+                        apr: '定植',
+                        may: '定植・管理',
+                        jun: '管理・施肥',
+                        jul: '施肥・管理',
+                        aug: '防除',
+                        sep: '防除・収穫',
+                        oct: '収穫',
+                        nov: '整理',
+                        dec: '計画'
+                    },
+                    fertilizer: {
+                        jan: '', feb: '', mar: '', apr: '', may: '1', jun: '2',
+                        jul: '3', aug: '', sep: '', oct: '', nov: '', dec: ''
+                    },
+                    pesticide: {
+                        jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
+                        jul: '1', aug: '1,2', sep: '', oct: '', nov: '', dec: ''
+                    },
+                    notes: {
+                        jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
+                        jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
+                    }
+                },
+
+                // Phase 5: 進捗管理・基準情報データ
+                prev_crop_chemical_fertilizer: Math.random() > 0.5 ? 'yes' : 'no',
+                prev_crop_soil_sterilization: 'no',
+                prev_crop_herbicide: 'no',
+                priority_pesticide: 'no',
+                organic_jas_certification: 'certified',
+                special_cultivation_certified: 'yes',
+                eco_farmer_certified: 'yes',
+                environment_incentive: 'yes',
+
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
